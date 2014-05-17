@@ -108,12 +108,15 @@ sub fetch_lex {
 
 =head2 score()
 
+Score the known vs unknown word part combinations into ratios of characters and
+"chunks" or "spans of ajacent parts."
+
 =cut
 
 sub score {
     my $self = shift;
 
-    # Visit each
+    # Visit each combination...
     my $i = 0;
     for my $c (@{ $self->{combos} }) {
         $i++;
@@ -152,6 +155,8 @@ sub score {
 
 =head2 grouping()
 
+Make groups of "un-digitized" strings where B<k>nown and B<u>nknown.
+
 =cut
 
 sub grouping {
@@ -173,6 +178,8 @@ sub grouping {
 }
 
 =head2 rle()
+
+Compress B<k>/B<u> strings into cntiguous chunks.
 
 =cut
 
@@ -337,6 +344,8 @@ sub or_together {
 
 =head2 reconstruct()
 
+Reconstruct the word, with delimiters around known combinations.
+
 =cut
 
 sub reconstruct {
@@ -373,8 +382,8 @@ __END__
 
 =head1 SEE ALSO
 
-L<Lingua::TokenParse>
+L<Lingua::TokenParse> - The predecessor of this module.
 
-L<http://en.wikipedia.org/wiki/Affix>
+L<http://en.wikipedia.org/wiki/Affix> is the tip of the iceberg...
 
 =cut
