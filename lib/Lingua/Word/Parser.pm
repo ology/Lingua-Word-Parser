@@ -16,15 +16,15 @@ Lingua::Word::Parser - Parse a word into known and unknown parts
 
 =head1 SYNOPSIS
 
-  use Lingua::Word::Parser;
-  my $p = Lingua::Word::Parser->new(
-    file => 'eg/lexicon.dat',
+ use Lingua::Word::Parser;
+ my $p = Lingua::Word::Parser->new(
     word => shift || 'abioticaly',
-  );
-  my ($known) = $p->knowns; #warn Dumper $known;
-  my $combos  = $p->power;  #warn Dumper $combos;
-  my $score   = $p->score;  #warn Dumper $score;
-  warn Dumper $score->{ [ sort keys $score ]->[-1] };
+    file => 'eg/lexicon.dat',
+ );
+ my ($known) = $p->knowns; #warn Dumper $known;
+ my $combos  = $p->power;  #warn Dumper $combos;
+ my $scored  = $p->score;  #warn Dumper $score;
+ warn Dumper $scored->{ [ sort keys $score ]->[-1] };
 
 
 =head1 DESCRIPTION
