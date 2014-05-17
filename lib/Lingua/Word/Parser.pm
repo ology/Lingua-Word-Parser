@@ -6,6 +6,7 @@ use warnings;
 use Bit::Vector;
 use Data::PowerSet;
 use IO::File;
+use Storable;
 
 our $VERSION = '0.01';
 
@@ -53,6 +54,7 @@ sub new {
     my $self  = {
         file   => $args{file} || undef,
         lex    => $args{lex}  || undef,
+        store  => $args{store} || undef,
         word   => $args{word} || undef,
         known  => {},
         masks  => {},
@@ -70,7 +72,10 @@ sub _init {
     $self->{wlen} = length $self->{word};
 
     # Set lex if given data.
-    if ( -e $self->{file} ) {
+    if ( -e $self->{store} ) {
+        $self->{lex} = retrieve( $self->{store} );
+    }
+    elsif ( -e $self->{file} ) {
         $self->fetch_lex;
     }
     else {
@@ -99,16 +104,19 @@ sub fetch_lex {
     }
     $fh->close;
 
-    # TODO if ( $self->{store} ) {
-    # TODO if ( $self->{db} ) {
-
     return $self->{lex};
+}
+
+sub write_store {
+    my $self = shift;
+    my $file = shift;
+    store $self->{lex}, $file;
 }
 
 =head2 score()
 
 Score the known vs unknown word part combinations into ratios of characters and
-"chunks" or "spans of ajacent parts."
+chunks or parts or "spans of adjacent characters."
 
 =cut
 
