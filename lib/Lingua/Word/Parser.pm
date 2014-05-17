@@ -58,7 +58,6 @@ sub new {
         masks  => {},
         combos => [],
         score  => {},
-        %args # Final override.
     };
     bless $self, $class;
     $self->_init(%args);
