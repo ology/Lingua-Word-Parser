@@ -107,97 +107,54 @@ sub fetch_lex {
     return $self->{lex};
 }
 
-sub write_store {
-    my $self = shift;
-    my $file = shift;
-    store $self->{lex}, $file;
-}
+=head2 knowns()
 
-=head2 score()
-
-Score the known vs unknown word part combinations into ratios of characters and
-chunks or parts or "spans of adjacent characters."
+Fingerprint the known word parts.
 
 =cut
 
-sub score {
+sub knowns {
     my $self = shift;
 
-    # Visit each combination...
-    my $i = 0;
-    for my $c (@{ $self->{combos} }) {
-        $i++;
-        my $together = $self->or_together(@$c);
+    # TODO What is this?
+    my $id = 0;
 
-        # Run-length encode an "un-digitized" string.
-        my $scored = rle($together);
+    for my $i (values %{ $self->{lex} }) {
+        while ($self->{word} =~ /$i->{re}/g) {
+            # Match positions.
+            my ($m, $n) = ($-[0], $+[0]);
+            # Get matched word-part.
+            my $part = substr $self->{word}, $m, $n - $m;
 
-        my %count = (
-            knowns   => 0,
-            unknowns => 0,
-            knownc   => 0,
-            unknownc => 0,
-        );
-        my $val = '';
-        for my $x ( reverse sort @$c ) {
-            # Breakdown knowns vs unknowns and knowncharacters vs unknowncharacters.
-            my $y = rle($x);
-            my ( $knowns, $unknowns, $knownc, $unknownc ) = grouping($y);
-            $val .= "$x ($y)[$knowns/$unknowns | $knownc/$unknownc] ";
-            # Accumulate the counters!
-            $count{knowns}   += $knowns;
-            $count{unknowns} += $unknowns;
-            $count{knownc}   += $knownc;
-            $count{unknownc} += $unknownc;
-        }
-        $val .= "$count{knowns}/$count{unknowns} + $count{knownc}/$count{unknownc} => "
-          . join( ', ', @{ reconstruct( $self->{word}, @$c ) } );
+            # Create the part-of-word bitmask.
+            my $mask = 0 x $m;                      # Before known
+            $mask   .= 1 x (($n - $m) || 1);        # Known part
+            $mask   .= 0 x ($self->{wlen} - $n);    # After known
 
-        push @{ $self->{score}{$together} }, $val;
-    }
+            # Output our progress.
+#            warn sprintf "%s %s - %s, %s (%d %d), %s\n",
+#                $mask,
+#                $i->{re},
+#                substr($self->{word}, 0, $m),
+#                $part,
+#                $m,
+#                $n - 1,
+#                substr($self->{word}, $n),
+#            ;
 
-    # 
-    return $self->{score};
-}
-
-=head2 grouping()
-
-Make groups of "un-digitized" strings where B<k>nown and B<u>nknown.
-
-=cut
-
-sub grouping {
-    my $scored = shift;
-    my @groups = $scored =~ /([ku]\d+)/g;
-    my ( $knowns, $unknowns ) = ( 0, 0 );
-    my ( $knownc, $unknownc ) = ( 0, 0 );
-    for ( @groups ) {
-        if ( /k(\d+)/ ) {
-            $knowns++;
-            $knownc += $1;
-        }
-        if ( /u(\d+)/ ) {
-            $unknowns++;
-            $unknownc += $1;
+            # Save the known as a member of a list keyed by starting position.
+            $self->{known}{$id} = {
+                part => $part,
+                span => [$m, $n - 1],
+                defn => $i->{defn},
+                mask => $mask,
+            };
+            # Save the relationship between mask and id.
+            $self->{masks}{$mask} = $id++;
         }
     }
-    return $knowns, $unknowns, $knownc, $unknownc;
-}
 
-=head2 rle()
-
-Compress B<k>/B<u> strings into cntiguous chunks.
-
-=cut
-
-sub rle {
-    my $scored = shift;
-    # Run-length encode an "un-digitized" string.
-    $scored =~ s/1/k/g; # Undigitize
-    $scored =~ s/0/u/g; # "
-    # Count contiguous chars.
-    $scored =~ s/(.)\1*/$1. length $&/ge;
-    return $scored;
+    return $self->{known}, $self->{masks};
 }
 
 =head2 power()
@@ -247,54 +204,97 @@ sub power {
     return $self->{combos};
 }
 
-=head2 knowns()
+=head2 score()
 
-Fingerprint the known word parts.
+Score the known vs unknown word part combinations into ratios of characters and
+chunks or parts or "spans of adjacent characters."
 
 =cut
 
-sub knowns {
+sub score {
     my $self = shift;
 
-    # TODO What is this?
-    my $id = 0;
+    # Visit each combination...
+    my $i = 0;
+    for my $c (@{ $self->{combos} }) {
+        $i++;
+        my $together = $self->or_together(@$c);
 
-    for my $i (values %{ $self->{lex} }) {
-        while ($self->{word} =~ /$i->{re}/g) {
-            # Match positions.
-            my ($m, $n) = ($-[0], $+[0]);
-            # Get matched word-part.
-            my $part = substr $self->{word}, $m, $n - $m;
+        # Run-length encode an "un-digitized" string.
+        my $scored = rle($together);
 
-            # Create the part-of-word bitmask.
-            my $mask = 0 x $m;                      # Before known
-            $mask   .= 1 x (($n - $m) || 1);        # Known part
-            $mask   .= 0 x ($self->{wlen} - $n);    # After known
-
-            # Output our progress.
-#            warn sprintf "%s %s - %s, %s (%d %d), %s\n",
-#                $mask,
-#                $i->{re},
-#                substr($self->{word}, 0, $m),
-#                $part,
-#                $m,
-#                $n - 1,
-#                substr($self->{word}, $n),
-#            ;
-
-            # Save the known as a member of a list keyed by starting position.
-            $self->{known}{$id} = {
-                part => $part,
-                span => [$m, $n - 1],
-                defn => $i->{defn},
-                mask => $mask,
-            };
-            # Save the relationship between mask and id.
-            $self->{masks}{$mask} = $id++;
+        my %count = (
+            knowns   => 0,
+            unknowns => 0,
+            knownc   => 0,
+            unknownc => 0,
+        );
+        my $val = '';
+        for my $x ( reverse sort @$c ) {
+            # Breakdown knowns vs unknowns and knowncharacters vs unknowncharacters.
+            my $y = rle($x);
+            my ( $knowns, $unknowns, $knownc, $unknownc ) = grouping($y);
+            $val .= "$x ($y)[$knowns/$unknowns | $knownc/$unknownc] ";
+            # Accumulate the counters!
+            $count{knowns}   += $knowns;
+            $count{unknowns} += $unknowns;
+            $count{knownc}   += $knownc;
+            $count{unknownc} += $unknownc;
         }
+        $val .= "$count{knowns}/$count{unknowns} + $count{knownc}/$count{unknownc} => "
+          . join( ', ', @{ reconstruct( $self->{word}, @$c ) } );
+
+        push @{ $self->{score}{$together} }, $val;
     }
 
-    return $self->{known}, $self->{masks};
+    # 
+    return $self->{score};
+}
+
+sub write_store {
+    my $self = shift;
+    my $file = shift;
+    store $self->{lex}, $file;
+}
+
+=head2 grouping()
+
+Make groups of "un-digitized" strings where B<k>nown and B<u>nknown.
+
+=cut
+
+sub grouping {
+    my $scored = shift;
+    my @groups = $scored =~ /([ku]\d+)/g;
+    my ( $knowns, $unknowns ) = ( 0, 0 );
+    my ( $knownc, $unknownc ) = ( 0, 0 );
+    for ( @groups ) {
+        if ( /k(\d+)/ ) {
+            $knowns++;
+            $knownc += $1;
+        }
+        if ( /u(\d+)/ ) {
+            $unknowns++;
+            $unknownc += $1;
+        }
+    }
+    return $knowns, $unknowns, $knownc, $unknownc;
+}
+
+=head2 rle()
+
+Compress B<k>/B<u> strings into cntiguous chunks.
+
+=cut
+
+sub rle {
+    my $scored = shift;
+    # Run-length encode an "un-digitized" string.
+    $scored =~ s/1/k/g; # Undigitize
+    $scored =~ s/0/u/g; # "
+    # Count contiguous chars.
+    $scored =~ s/(.)\1*/$1. length $&/ge;
+    return $scored;
 }
 
 =head2 does_not_overlap()
