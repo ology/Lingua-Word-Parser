@@ -1,10 +1,13 @@
-#!perl
+#!/usr/bin/env perl
+use strict;
+use warnings;
+
 use Test::More;
 
-BEGIN {
-    use_ok 'Lingua::Word::Parser';
-}
+my $module = 'Lingua::Word::Parser';
 
-diag("Testing Lingua::Word::Parser $Lingua::Word::Parser::VERSION, Perl $], $^X");
+use_ok $module;
+
+diag(sprintf( 'Testing %s %s with Perl %s, %s', $module, $module->VERSION, $], $^X ));
 
 done_testing();
