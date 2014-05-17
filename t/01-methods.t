@@ -1,20 +1,16 @@
 #!perl
 use Test::More;
 
-BEGIN {
-    use_ok 'Lingua::Word::Parser';
-}
+use_ok 'Lingua::Word::Parser';
 
-my $obj = eval { Lingua::Word::Parser->new };
-isa_ok $obj, 'Lingua::Word::Parser';
+my $p = eval { Lingua::Word::Parser->new };
+isa_ok $p, 'Lingua::Word::Parser';
 ok !$@, 'created with no arguments';
-my $x = $obj->{foo};
-is $x, 'bar', "foo: $x";
+is ref $p->{lex}, '', 'no lex';
 
-$obj = Lingua::Word::Parser->new(
-    foo => 'Zap!',
+$p = Lingua::Word::Parser->new(
+    file => 'eg/lexicon.dat',
 );
-$x = $obj->{foo};
-like $x, qr/zap/i, "foo: $x";
+is ref $p->{lex}, 'HASH', 'lex';
 
 done_testing();
