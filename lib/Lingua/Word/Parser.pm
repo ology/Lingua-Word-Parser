@@ -1,13 +1,10 @@
 package Lingua::Word::Parser;
 
-# ABSTRACT: Frobnicate Universes
-
 use strict;
 use warnings;
 use Carp qw(croak);
 
 use Bit::Vector;
-use Data::Dumper::Concise;
 use Data::PowerSet;
 use IO::File;
 
@@ -15,7 +12,7 @@ our $VERSION = '0.01';
 
 =head1 NAME
 
-Lingua::Word::Parser - Parse word parts
+Lingua::Word::Parser - Parse a word into known and unknown parts
 
 =head1 SYNOPSIS
 
@@ -45,58 +42,56 @@ Arguments and defaults:
 
 sub new {
     my $class = shift;
-    my %args = @_;
-    # Explicit constructor:
-    my $self = {
-        word => $args{word} || undef,
-        lex  => $args{lex}  || undef,
+    my %args  = @_;
+    my $self  = {
+        file   => $args{file} || undef,
+        lex    => $args{lex}  || undef,
+        word   => $args{word} || undef,
+        known  => {},
+        masks  => {},
+        combos => [],
+        score  => {},
         %args # Final override.
     };
     bless $self, $class;
-    $self->_init(%args);
+#    $self->_init(%args);
     return $self;
 }
 sub _init {
     my ($self, %args) = @_;
-#    $self->{word} ||= 'bar';
-#    $self->{lex} ||= 123;
+
+    # Set the length of our word.
+    $self->{wlen} = length $self->{word};
+
+    # Set lex if given data.
+    if ( $self->{file} ) {
+        $self->fetch_lex;
+    }
 }
 
 =head2 fetch_lex()
+
 =cut
 
 sub fetch_lex { # Populate word-part regular expression lexicon.
     my $self = shift;
 
-    if ( $self->{file} ) {
-        my $fh = IO::File->new();
-        if ( $fh->open( '<' . $self->{file} ) ) {
-            chomp;
-            my ($re, $defn) = split /\s+/, $_, 2;
-            $self->{lex}{$re} = { defn => $defn, re => qr/$re/ };
+    # Open the given file for reading...
+    my $fh = IO::File->new();
+    if ( $fh->open( '<' . $self->{file} ) ) {
+        # Split space-separated entries.
+        chomp;
+        my ($re, $defn) = split /\s+/, $_, 2;
+        # Add the entry to the lexicon.
+        $self->{lex}{$re} = { defn => $defn, re => qr/$re/ };
 
-            $fh->close;
-        }
+        $fh->close;
     }
+
     # TODO if ( $self->{store} ) {
     # TODO if ( $self->{db} ) {
 
     return $self->{lex};
-}
-
-=head2 main()
-
-=cut
-
-sub main {
-    # Find the known word-part positions.
-    my ($known, $mask_id) = get_knowns($word, $lex);
-    #warn Dumper $known;
-    my $combos = power($mask_id);
-    #warn Dumper $combos;
-    my $score  = score($combos);
-    #warn Dumper $score;
-    warn Dumper $score->{ [ sort keys $score ]->[-1] };
 }
 
 =head2 score()
@@ -104,17 +99,13 @@ sub main {
 =cut
 
 sub score {
-    # Get the list of combinations.
-    my $combos = shift;
-
-    # Declare the score hash.
-    my $score = {};
+    my $self = shift;
 
     # Visit each
     my $i = 0;
-    for my $c (@$combos) {
+    for my $c (@{ $self->{combos} }) {
         $i++;
-        my $together = or_together(@$c);
+        my $together = $self->or_together(@$c);
 
         # Run-length encode an "un-digitized" string.
         my $scored = rle($together);
@@ -138,13 +129,13 @@ sub score {
             $count{unknownc} += $unknownc;
         }
         $val .= "$count{knowns}/$count{unknowns} + $count{knownc}/$count{unknownc} => "
-          . join( ', ', @{ reconstruct( $word, @$c ) } );
+          . join( ', ', @{ reconstruct( $self->{word}, @$c ) } );
 
-        push @{ $score->{$together} }, $val;
+        push @{ $self->{score}{$together} }, $val;
     }
 
     # 
-    return $score;
+    return $self->{score};
 }
 
 =head2 grouping()
@@ -188,15 +179,10 @@ sub rle {
 =cut
 
 sub power { # Find the "non-overlapping powerset."
-
-    # List if bitmasks.
-    my $masks = shift;
-
-    # Bucket for our saved combinations.
-    my $combos = [];
+    my $self = shift;
 
     # Get a new powerset generator.
-    my $power = Data::PowerSet->new(sort keys %$masks);
+    my $power = Data::PowerSet->new(sort keys %{ $self->{masks} });
 
     # Consider each member of the powerset.. to save or skip?
     while (my $collection = $power->next) {
@@ -215,7 +201,7 @@ sub power { # Find the "non-overlapping powerset."
 #                warn "\tP:$compare v $mask\n";
 
                 # Skip this collection if an overlap is found.
-                if (not does_not_overlap($compare, $mask)) {
+                if (not $self->does_not_overlap($compare, $mask)) {
 #                    warn "\t\tO:$compare v $mask\n";
                     last LOOP;
                 }
@@ -223,14 +209,14 @@ sub power { # Find the "non-overlapping powerset."
                 # Save this collection if we made it to the last pair.
                 if ($i == @$collection - 2 && $j == @$collection - 1) {
 #                    warn "\t\tE:$compare v $mask\n";
-                    push @$combos, $collection;
+                    push @{ $self->{combos} }, $collection;
                 }
             }
         }
     }
 
     # Hand back the "non-overlapping powerset."
-    return $combos;
+    return $self->{combos};
 }
 
 =head2 get_knowns()
@@ -238,51 +224,47 @@ sub power { # Find the "non-overlapping powerset."
 =cut
 
 sub get_knowns { # Fingerprint the known word parts.
-    my ($word, $lex) = @_;
+    my $self = shift;
 
-    # Find the known word-part positions.
-    my $known = {};
-
-    # Poor-man's relational integrity:
+    # TODO What is this?
     my $id = 0;
-    my $mask_id = {};
 
-    for my $i (values %$lex) {
-        while ($word =~ /$i->{re}/g) {
+    for my $i (values %{ $self->{lex} }) {
+        while ($self->{word} =~ /$i->{re}/g) {
             # Match positions.
             my ($m, $n) = ($-[0], $+[0]);
             # Get matched word-part.
-            my $part = substr $word, $m, $n - $m;
+            my $part = substr $self->{word}, $m, $n - $m;
 
             # Create the part-of-word bitmask.
             my $mask = 0 x $m;                      # Before known
             $mask   .= 1 x (($n - $m) || 1);        # Known part
-            $mask   .= 0 x ($WLEN - $n);    # After known
+            $mask   .= 0 x ($self->{wlen} - $n);    # After known
 
             # Output our progress.
 #            warn sprintf "%s %s - %s, %s (%d %d), %s\n",
 #                $mask,
 #                $i->{re},
-#                substr($word, 0, $m),
+#                substr($self->{word}, 0, $m),
 #                $part,
 #                $m,
 #                $n - 1,
-#                substr($word, $n),
+#                substr($self->{word}, $n),
 #            ;
 
             # Save the known as a member of a list keyed by starting position.
-            $known->{$id} = {
+            $self->{known}{$id} = {
                 part => $part,
                 span => [$m, $n - 1],
                 defn => $i->{defn},
                 mask => $mask,
             };
             # Save the relationship between mask and id.
-            $mask_id->{$mask} = $id++;
+            $self->{masks}{$mask} = $id++;
         }
     }
 
-    return $known, $mask_id;
+    return $self->{known}, $self->{masks};
 }
 
 =head2 does_not_overlap()
@@ -290,14 +272,15 @@ sub get_knowns { # Fingerprint the known word parts.
 =cut
 
 sub does_not_overlap { # Compute whether the given masks overlap.
+    my $self = shift;
 
     # Get our masks to check.
     my ($mask, $check) = @_;
 
     # Create the bitstrings to compare.
-    my $bitmask  = Bit::Vector->new_Bin($WLEN, $mask);
-    my $orclone  = Bit::Vector->new_Bin($WLEN, $check);
-    my $xorclone = Bit::Vector->new_Bin($WLEN, $check);
+    my $bitmask  = Bit::Vector->new_Bin($self->{wlen}, $mask);
+    my $orclone  = Bit::Vector->new_Bin($self->{wlen}, $check);
+    my $xorclone = Bit::Vector->new_Bin($self->{wlen}, $check);
 
     # Compute or and xor for the strings.
     $orclone->Or($bitmask, $orclone);
@@ -312,16 +295,17 @@ sub does_not_overlap { # Compute whether the given masks overlap.
 =cut
 
 sub or_together { # Combine a list of bitmasks.
+    my $self = shift;
 
     # Get our masks to score.
     my @masks = @_;
 
     # Initialize the bitmask to return, to zero.
-    my $result = Bit::Vector->new_Bin($WLEN, (0 x $WLEN));
+    my $result = Bit::Vector->new_Bin($self->{wlen}, (0 x $self->{wlen}));
 
     for my $mask (@masks) {
         # Create the bitstrings to compare.
-        my $bitmask = Bit::Vector->new_Bin($WLEN, $mask);
+        my $bitmask = Bit::Vector->new_Bin($self->{wlen}, $mask);
 
         # Get the union of the bit strings.
         $result->Or($result, $bitmask);
