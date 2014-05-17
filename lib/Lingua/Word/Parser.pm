@@ -2,7 +2,6 @@ package Lingua::Word::Parser;
 
 use strict;
 use warnings;
-use Carp qw(croak);
 
 use Bit::Vector;
 use Data::PowerSet;
@@ -17,7 +16,15 @@ Lingua::Word::Parser - Parse a word into known and unknown parts
 =head1 SYNOPSIS
 
   use Lingua::Word::Parser;
-  $x = Lingua::Word::Parser->new(%arguments);
+  my $p = Lingua::Word::Parser->new(
+    file => 'eg/lexicon.dat',
+    word => shift || 'abioticaly',
+  );
+  my ($known) = $p->knowns; #warn Dumper $known;
+  my $combos  = $p->power;  #warn Dumper $combos;
+  my $score   = $p->score;  #warn Dumper $score;
+  warn Dumper $score->{ [ sort keys $score ]->[-1] };
+
 
 =head1 DESCRIPTION
 
@@ -54,7 +61,7 @@ sub new {
         %args # Final override.
     };
     bless $self, $class;
-#    $self->_init(%args);
+    $self->_init(%args);
     return $self;
 }
 sub _init {
@@ -64,29 +71,34 @@ sub _init {
     $self->{wlen} = length $self->{word};
 
     # Set lex if given data.
-    if ( $self->{file} ) {
+    if ( -e $self->{file} ) {
         $self->fetch_lex;
+    }
+    else {
+        warn "Can't read the lexicon file: '$self->{file}'\n";
     }
 }
 
 =head2 fetch_lex()
 
+Populate word-part => regular-expression lexicon.
+
 =cut
 
-sub fetch_lex { # Populate word-part regular expression lexicon.
+sub fetch_lex {
     my $self = shift;
 
     # Open the given file for reading...
     my $fh = IO::File->new();
-    if ( $fh->open( '<' . $self->{file} ) ) {
+    $fh->open( "< $self->{file}" ) or die "Can't read file: '$self->{file}'";
+    for ( <$fh> ) {
         # Split space-separated entries.
         chomp;
         my ($re, $defn) = split /\s+/, $_, 2;
         # Add the entry to the lexicon.
         $self->{lex}{$re} = { defn => $defn, re => qr/$re/ };
-
-        $fh->close;
     }
+    $fh->close;
 
     # TODO if ( $self->{store} ) {
     # TODO if ( $self->{db} ) {
@@ -176,9 +188,11 @@ sub rle {
 
 =head2 power()
 
+Find the "non-overlapping powerset."
+
 =cut
 
-sub power { # Find the "non-overlapping powerset."
+sub power {
     my $self = shift;
 
     # Get a new powerset generator.
@@ -219,11 +233,13 @@ sub power { # Find the "non-overlapping powerset."
     return $self->{combos};
 }
 
-=head2 get_knowns()
+=head2 knowns()
+
+Fingerprint the known word parts.
 
 =cut
 
-sub get_knowns { # Fingerprint the known word parts.
+sub knowns {
     my $self = shift;
 
     # TODO What is this?
@@ -269,9 +285,11 @@ sub get_knowns { # Fingerprint the known word parts.
 
 =head2 does_not_overlap()
 
+Compute whether the given masks overlap.
+
 =cut
 
-sub does_not_overlap { # Compute whether the given masks overlap.
+sub does_not_overlap {
     my $self = shift;
 
     # Get our masks to check.
@@ -292,9 +310,11 @@ sub does_not_overlap { # Compute whether the given masks overlap.
 
 =head2 or_together()
 
+Combine a list of bitmasks.
+
 =cut
 
-sub or_together { # Combine a list of bitmasks.
+sub or_together {
     my $self = shift;
 
     # Get our masks to score.
