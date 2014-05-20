@@ -220,9 +220,7 @@ sub score {
         $i++;
         my $together = $self->or_together(@$c);
 
-        # Run-length encode an "un-digitized" string.
-        my $scored = rle($together);
-
+        # Breakdown knowns vs unknowns and knowncharacters vs unknowncharacters.
         my %count = (
             knowns   => 0,
             unknowns => 0,
@@ -231,7 +229,7 @@ sub score {
         );
         my $val = '';
         for my $x ( reverse sort @$c ) {
-            # Breakdown knowns vs unknowns and knowncharacters vs unknowncharacters.
+            # Run-length encode an "un-digitized" string.
             my $y = rle($x);
             my ( $knowns, $unknowns, $knownc, $unknownc ) = grouping($y);
             $val .= "$x ($y)[$knowns/$unknowns | $knownc/$unknownc] ";
