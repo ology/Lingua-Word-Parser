@@ -72,10 +72,10 @@ sub _init {
     $self->{wlen} = length $self->{word};
 
     # Set lex if given data.
-    if ( -e $self->{store} ) {
+    if ( $self->{store} && -e $self->{store} ) {
         $self->{lex} = retrieve( $self->{store} );
     }
-    elsif ( -e $self->{file} ) {
+    elsif ( $self->{file} && -e $self->{file} ) {
         $self->fetch_lex;
     }
     else {
