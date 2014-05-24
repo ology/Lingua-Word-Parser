@@ -54,7 +54,6 @@ sub new {
     my $self  = {
         file   => $args{file} || undef,
         lex    => $args{lex}  || undef,
-        store  => $args{store} || undef,
         word   => $args{word} || undef,
         known  => {},
         masks  => {},
@@ -72,10 +71,7 @@ sub _init {
     $self->{wlen} = length $self->{word};
 
     # Set lex if given data.
-    if ( $self->{store} && -e $self->{store} ) {
-        $self->{lex} = retrieve( $self->{store} );
-    }
-    elsif ( $self->{file} && -e $self->{file} ) {
+    if ( $self->{file} && -e $self->{file} ) {
         $self->fetch_lex;
     }
 }
@@ -251,11 +247,6 @@ sub score {
 
     # 
     return $self->{score};
-}
-
-sub write_store {
-    my $self = shift;
-    store $self->{lex}, $self->{store};
 }
 
 =head2 grouping()
