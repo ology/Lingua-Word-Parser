@@ -255,8 +255,7 @@ sub score {
 
 sub write_store {
     my $self = shift;
-    my $file = shift;
-    store $self->{lex}, $file;
+    store $self->{lex}, $self->{store};
 }
 
 =head2 grouping()
