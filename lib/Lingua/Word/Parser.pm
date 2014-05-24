@@ -239,14 +239,14 @@ sub score {
             # Run-length encode an "un-digitized" string.
             my $y = rle($x);
             my ( $knowns, $unknowns, $knownc, $unknownc ) = grouping($y);
-            $val .= "$x ($y)[$knowns/$unknowns | $knownc/$unknownc] ";
+#            $val .= "$x ($y)[$knowns/$unknowns | $knownc/$unknownc] ";
             # Accumulate the counters!
             $count{knowns}   += $knowns;
             $count{unknowns} += $unknowns;
             $count{knownc}   += $knownc;
             $count{unknownc} += $unknownc;
         }
-        $val .= "$count{knowns}/$count{unknowns} + $count{knownc}/$count{unknownc} => "
+        $val .= "$count{knowns}:$count{unknowns} chunks :: $count{knownc}:$count{unknownc} chars => "
           . join( ', ', @{ reconstruct( $self->{word}, @$c ) } );
 
         push @{ $self->{score}{$together} }, $val;
