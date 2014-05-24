@@ -246,7 +246,7 @@ sub score {
             $count{knownc}   += $knownc;
             $count{unknownc} += $unknownc;
         }
-        $val .= "$count{knowns}:$count{unknowns} chunks :: $count{knownc}:$count{unknownc} chars => "
+        $val .= "$count{knowns}:$count{unknowns} chunks, $count{knownc}:$count{unknownc} chars => "
           . join( ', ', @{ reconstruct( $self->{word}, @$c ) } );
 
         push @{ $self->{score}{$together} }, $val;
