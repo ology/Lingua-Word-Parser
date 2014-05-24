@@ -25,7 +25,6 @@ Lingua::Word::Parser - Parse a word into known and unknown parts
  my $scored  = $p->score;  #warn Dumper $score;
  warn Dumper $scored->{ [ sort keys $score ]->[-1] };
 
-
 =head1 DESCRIPTION
 
 A C<Lingua::Word::Parser> breaks a word into known affixes.
