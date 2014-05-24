@@ -173,6 +173,13 @@ sub power {
     while (my $collection = $power->next) {
 #        warn "C: @$collection\n";
 
+        # Save this collection if it has only one item.
+        if (1 == @$collection) {
+#            warn "\t\tE: only 1 mask\n";
+            push @{ $self->{combos} }, $collection;
+            next;
+        }
+
         # Compare each mask against the others.
         LOOP: for my $i (0 .. @$collection - 1) {
 
