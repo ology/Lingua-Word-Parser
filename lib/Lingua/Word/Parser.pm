@@ -273,7 +273,7 @@ sub grouping {
 
 =head2 rle()
 
-Compress B<k>/B<u> strings into cntiguous chunks.
+Compress B<k>/B<u> strings into contiguous chunks.
 
 =cut
 
