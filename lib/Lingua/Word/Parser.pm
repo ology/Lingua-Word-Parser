@@ -243,7 +243,6 @@ sub score {
         push @{ $self->{score}{$together} }, $val;
     }
 
-    # 
     return $self->{score};
 }
 
