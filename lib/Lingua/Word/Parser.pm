@@ -78,9 +78,6 @@ sub _init {
     elsif ( $self->{file} && -e $self->{file} ) {
         $self->fetch_lex;
     }
-    else {
-        warn "Can't read the lexicon file: '$self->{file}'\n";
-    }
 }
 
 =head2 fetch_lex()
