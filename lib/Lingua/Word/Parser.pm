@@ -6,7 +6,6 @@ use warnings;
 use Bit::Vector;
 use Data::PowerSet;
 use IO::File;
-use Storable;
 
 our $VERSION = '0.01';
 
