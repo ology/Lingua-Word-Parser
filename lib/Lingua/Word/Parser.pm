@@ -248,7 +248,7 @@ sub score {
 
 =head2 grouping()
 
-Make groups of "un-digitized" strings where B<k>nown and B<u>nknown.
+Make groups of "un-digitized" strings where B<k> = known and B<u> = unknown.
 
 =cut
 
