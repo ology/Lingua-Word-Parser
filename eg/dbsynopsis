@@ -11,8 +11,7 @@ my $p = Lingua::Word::Parser->new(
   dbuser => shift || die(usage()),
   dbpass => shift || die(usage()),
 );
-warn Dumper $p->{lex};
-__END__
+#warn Dumper $p->{lex};
 
 # Find the known word-part positions.
 my ($known) = $p->knowns;
@@ -20,8 +19,8 @@ my ($known) = $p->knowns;
 my $combos = $p->power;
 #warn Dumper $combos;
 my $score = $p->score;
-warn Dumper $score;
-#warn Dumper $score->{ [ sort keys $score ]->[-1] };
+#warn Dumper $score;
+warn Dumper $score->{ [ sort keys $score ]->[-1] };
 
 sub usage {
     return "perl $0 word dbname dbuser dbpass\n";
