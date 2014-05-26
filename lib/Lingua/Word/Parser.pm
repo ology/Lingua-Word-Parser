@@ -4,10 +4,11 @@ use strict;
 use warnings;
 
 use Bit::Vector;
+use DBI;
 use Data::PowerSet;
 use IO::File;
 
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 
 =head1 NAME
 
@@ -50,9 +51,14 @@ sub new {
     my $class = shift;
     my %args  = @_;
     my $self  = {
-        file   => $args{file} || undef,
-        lex    => $args{lex}  || undef,
-        word   => $args{word} || undef,
+        file   => $args{file},
+        dbhost => $args{dbhost} || 'localhost',
+        dbtype => $args{dbtype} || 'mysql',
+        dbname => $args{dbname},
+        dbuser => $args{dbuser},
+        dbpass => $args{dbpass},
+        lex    => $args{lex},
+        word   => $args{word},
         known  => {},
         masks  => {},
         combos => [],
@@ -72,11 +78,22 @@ sub _init {
     if ( $self->{file} && -e $self->{file} ) {
         $self->fetch_lex;
     }
+    elsif( $self->{dbname} )
+    {
+        $self->db_fetch;
+    }
 }
 
 =head2 fetch_lex()
 
 Populate word-part => regular-expression lexicon.
+
+This file has lines of the form:
+
+ a(?=\w) opposite
+ ab(?=\w) away
+ (?<=\w)o(?=\w) combining
+ (?<=\w)tic possessing
 
 =cut
 
@@ -96,6 +113,47 @@ sub fetch_lex {
     $fh->close;
 
     return $self->{lex};
+}
+
+=head2 db_fetch()
+
+Populate the lexicon from a database source called C<`fragments`>.
+
+This database table has records of the form:
+
+  prefix  affix  suffix  definition
+  ---------------------------------
+          a      (?=\w)  opposite
+          ab     (?=\w)  away
+ (?<=\w)  o      (?=\w)  combining
+ (?<=\w)  tic            possessing
+
+=cut
+
+sub db_fetch {
+    my $self = shift;
+
+    my $dsn = "DBI:$self->{dbtype}:$self->{dbname};$self->{dbhost}";
+
+    my $dbh = DBI->connect( $dsn, $self->{dbuser}, $self->{dbpass}, { RaiseError => 1, AutoCommit => 1 } )
+      or die "Unable to connect to $self->{dbname}: $DBI::errstr\n";
+
+    my $sql = 'SELECT prefix, affix, suffix, definition FROM fragment';
+
+    my $sth = $dbh->prepare($sql);
+    $sth->execute or die "Unable to execute '$sql': $DBI::errstr\n";
+
+    while( my @row = $sth->fetchrow_array ) {
+        my $part = $row[1];
+        $part    = $row[0] . $row[1] if $row[0];
+        $part   .= $row[2] if $row[2];
+        $self->{lex}{$part} = $row[3];
+    }
+    die "Fetch terminated early: $DBI::errstr\n" if $DBI::errstr;
+
+    $sth->finish or die "Unable to finish '$sql': $DBI::errstr\n";
+
+    $dbh->disconnect or die "Unable to disconnect from $self->{dbname}: $DBI::errstr\n";
 }
 
 =head2 knowns()
