@@ -18,8 +18,15 @@ Lingua::Word::Parser - Parse a word into known and unknown parts
 
  use Lingua::Word::Parser;
  my $p = Lingua::Word::Parser->new(
-    word => shift || 'abioticaly',
+    word => 'abioticaly',
     file => 'eg/lexicon.dat',
+ );
+ # Or with a localhost database source:
+ my $p = Lingua::Word::Parser->new(
+    word   => 'abioticaly',
+    dbname => 'fragments',
+    dbuser => 'akbar',
+    dbpass => '0p3n53454m3',
  );
  my ($known) = $p->knowns; #warn Dumper $known;
  my $combos  = $p->power;  #warn Dumper $combos;
