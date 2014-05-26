@@ -1,5 +1,8 @@
 Revision history for Lingua-Word-Parser
 
 {{$NEXT}}
+    - Added database source access to populate the lexicon.
+
+0.01  2014-05-24
     - Imported functionality from nomen-re.
     - Minted by Dist::Zilla
