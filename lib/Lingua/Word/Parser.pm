@@ -154,7 +154,7 @@ sub db_fetch {
         my $part = $row[1];
         $part    = $row[0] . $row[1] if $row[0];
         $part   .= $row[2] if $row[2];
-        $self->{lex}{$part} = $row[3];
+        $self->{lex}{$part} = { defn => $row[3], re => qr/$part/ };
     }
     die "Fetch terminated early: $DBI::errstr\n" if $DBI::errstr;
 
