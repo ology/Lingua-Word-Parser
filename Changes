@@ -1,6 +1,9 @@
 Revision history for Lingua-Word-Parser
 
 {{$NEXT}}
+    - Added AWOL database source lexicon.
+
+0.02  2014-05-26
     - Added database source access to populate the lexicon.
 
 0.01  2014-05-24
