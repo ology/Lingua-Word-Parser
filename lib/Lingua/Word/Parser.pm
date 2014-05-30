@@ -128,7 +128,7 @@ Populate the lexicon from a database source called C<`fragments`>.
 
 This database table has records of the form:
 
-  prefix  affix  suffix  definition
+  pre     affix  post    definition
   ---------------------------------
           a      (?=\w)  opposite
           ab     (?=\w)  away
@@ -145,7 +145,7 @@ sub db_fetch {
     my $dbh = DBI->connect( $dsn, $self->{dbuser}, $self->{dbpass}, { RaiseError => 1, AutoCommit => 1 } )
       or die "Unable to connect to $self->{dbname}: $DBI::errstr\n";
 
-    my $sql = 'SELECT prefix, affix, suffix, definition FROM fragment';
+    my $sql = 'SELECT pre, affix, post, definition FROM fragment';
 
     my $sth = $dbh->prepare($sql);
     $sth->execute or die "Unable to execute '$sql': $DBI::errstr\n";
