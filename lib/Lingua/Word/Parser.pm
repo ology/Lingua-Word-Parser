@@ -301,13 +301,26 @@ sub score {
             $count{knownc}   += $knownc;
             $count{unknownc} += $unknownc;
         }
+
+        my ( $s, $m ) = reconstruct( $self->{word}, @$c );
 #        $val .= "$count{knowns}:$count{unknowns} chunks / $count{knownc}:$count{unknownc} chars => "
-#          . join( ', ', @{ reconstruct( $self->{word}, @$c ) } );
+#          . join( ', ', @$s );
 #        warn "V:$val\n";
 
         my $key = "$count{knowns}:$count{unknowns} chunks / $count{knownc}:$count{unknownc} chars";
-        $val = join ', ', @{ reconstruct( $self->{word}, @$c ) };
-        push @{ $self->{score}{$together} }, { score => $key, partition => $val };
+        $val = join ', ', @$s;
+
+        # TODO Re-model the knowns!!
+        my $defn = '';
+        for my $i ( @$m )
+        {
+            for my $j ( keys $self->{known} )
+            {
+                $defn .= $self->{known}{$j}{defn} . '. ' if $self->{known}{$j}{mask} eq $i;
+            }
+        }
+
+        push @{ $self->{score}{$together} }, { score => $key, partition => $val, definition => $defn };
     }
 
     return $self->{score};
@@ -415,6 +428,7 @@ sub reconstruct {
     my ( $word, @masks ) = @_;
 
     my $strings = [];
+    my $masks   = [];
 
     for my $mask (reverse sort @masks) {
         my $i = 0;
@@ -435,9 +449,10 @@ sub reconstruct {
         }
         $string .= '>' if $last;
         push @$strings, $string;
+        push @$masks, $mask;
     }
 
-    return $strings;
+    return $strings, $masks;
 }
 
 1;
