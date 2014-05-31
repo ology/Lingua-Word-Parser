@@ -128,12 +128,12 @@ Populate the lexicon from a database source called C<`fragments`>.
 
 This database table has records of the form:
 
-  pre     affix  post    definition
-  ---------------------------------
-          a      (?=\w)  opposite
-          ab     (?=\w)  away
- (?<=\w)  o      (?=\w)  combining
- (?<=\w)  tic            possessing
+         affix     definition
+  -----------------------------
+         a(?=\w)   opposite
+         ab(?=\w)  away
+  (?<=\w)o(?=\w)   combining
+  (?<=\w)tic       possessing
 
 =cut
 
@@ -151,7 +151,8 @@ sub db_fetch {
     $sth->execute or die "Unable to execute '$sql': $DBI::errstr\n";
 
     while( my @row = $sth->fetchrow_array ) {
-        $self->{lex}{$part} = { re => qr/$row[0]/, defn => $row[1] };
+        my $part = $row[0];
+        $self->{lex}{$part} = { re => qr/$part/, defn => $row[1] };
     }
     die "Fetch terminated early: $DBI::errstr\n" if $DBI::errstr;
 
