@@ -145,16 +145,13 @@ sub db_fetch {
     my $dbh = DBI->connect( $dsn, $self->{dbuser}, $self->{dbpass}, { RaiseError => 1, AutoCommit => 1 } )
       or die "Unable to connect to $self->{dbname}: $DBI::errstr\n";
 
-    my $sql = 'SELECT pre, affix, post, definition FROM fragment';
+    my $sql = 'SELECT affix, definition FROM fragment';
 
     my $sth = $dbh->prepare($sql);
     $sth->execute or die "Unable to execute '$sql': $DBI::errstr\n";
 
     while( my @row = $sth->fetchrow_array ) {
-        my $part = $row[1];
-        $part    = $row[0] . $row[1] if $row[0];
-        $part   .= $row[2] if $row[2];
-        $self->{lex}{$part} = { defn => $row[3], re => qr/$part/ };
+        $self->{lex}{$part} = { re => qr/$row[0]/, defn => $row[1] };
     }
     die "Fetch terminated early: $DBI::errstr\n" if $DBI::errstr;
 
