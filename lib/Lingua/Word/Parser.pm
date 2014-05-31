@@ -31,6 +31,7 @@ Lingua::Word::Parser - Parse a word into known and unknown parts
  my ($known) = $p->knowns; #warn Dumper $known;
  my $combos  = $p->power;  #warn Dumper $combos;
  my $scored  = $p->score;  #warn Dumper $score;
+ # The best guess is the last sorted score-set:
  warn Dumper $scored->{ [ sort keys $score ]->[-1] };
 
 =head1 DESCRIPTION
