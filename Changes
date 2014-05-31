@@ -1,6 +1,9 @@
 Revision history for Lingua-Word-Parser
 
 {{$NEXT}}
+    - Returned the definitions of the knowns in the score.
+
+0.0201 2014-05-31
     - Added AWOL database source lexicon.
     - Eliminated pre & post columns.
     - Return a friendly hashref from score.
