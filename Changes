@@ -2,6 +2,8 @@ Revision history for Lingua-Word-Parser
 
 {{$NEXT}}
     - Added AWOL database source lexicon.
+    - Eliminated pre & post columns.
+    - Return a friendly hashref from score.
 
 0.02  2014-05-26
     - Added database source access to populate the lexicon.
