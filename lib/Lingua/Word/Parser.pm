@@ -300,10 +300,13 @@ sub score {
             $count{knownc}   += $knownc;
             $count{unknownc} += $unknownc;
         }
-        $val .= "$count{knowns}:$count{unknowns} chunks, $count{knownc}:$count{unknownc} chars => "
-          . join( ', ', @{ reconstruct( $self->{word}, @$c ) } );
+#        $val .= "$count{knowns}:$count{unknowns} chunks / $count{knownc}:$count{unknownc} chars => "
+#          . join( ', ', @{ reconstruct( $self->{word}, @$c ) } );
+#        warn "V:$val\n";
 
-        push @{ $self->{score}{$together} }, $val;
+        my $key = "$count{knowns}:$count{unknowns} chunks / $count{knownc}:$count{unknownc} chars";
+        $val = join ', ', @{ reconstruct( $self->{word}, @$c ) };
+        push @{ $self->{score}{$together} }, { score => $key, partition => $val };
     }
 
     return $self->{score};
