@@ -8,7 +8,7 @@ use DBI;
 use Data::PowerSet;
 use IO::File;
 
-our $VERSION = '0.02';
+our $VERSION = '0.0201';
 
 =head1 NAME
 
