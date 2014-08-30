@@ -1,5 +1,7 @@
 package Lingua::Word::Parser;
 
+# ABSTRACT: Parse a word into known and unknown parts
+
 use strict;
 use warnings;
 
