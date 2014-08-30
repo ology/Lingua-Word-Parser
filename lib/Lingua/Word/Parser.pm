@@ -30,7 +30,7 @@ our $VERSION = '0.0211';
  my $combos  = $p->power;  #warn Dumper $combos;
  my $scored  = $p->score;  #warn Dumper $score;
  # The best guess is the last sorted score-set:
- warn Dumper $scored->{ [ sort keys $score ]->[-1] };
+ warn Dumper $scored->{ [ sort keys %$score ]->[-1] };
 
 =head1 DESCRIPTION
 
@@ -312,7 +312,7 @@ sub score {
         my $defn = '';
         for my $i ( @$m )
         {
-            for my $j ( keys $self->{known} )
+            for my $j ( keys %{ $self->{known} } )
             {
                 $defn .= $self->{known}{$j}{defn} . '. ' if $self->{known}{$j}{mask} eq $i;
             }
