@@ -22,6 +22,6 @@ is keys %$known, 10, 'known';
 my $power = $p->power;
 is @$power, 215, 'power';
 my $score = $p->score;
-is @{ $score->{ [ sort keys $score ]->[-1] } }, 2, 'score';
+is @{ $score->{ [ sort keys %$score ]->[-1] } }, 2, 'score';
 
 done_testing();
