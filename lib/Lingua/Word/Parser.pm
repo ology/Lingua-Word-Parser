@@ -8,11 +8,7 @@ use DBI;
 use Data::PowerSet;
 use IO::File;
 
-our $VERSION = '0.0210';
-
-=head1 NAME
-
-Lingua::Word::Parser - Parse a word into known and unknown parts
+our $VERSION = '0.0211';
 
 =head1 SYNOPSIS
 
