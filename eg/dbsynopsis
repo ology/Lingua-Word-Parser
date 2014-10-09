@@ -20,7 +20,7 @@ my $combos = $p->power;
 #warn Dumper $combos;
 my $score = $p->score;
 #warn Dumper $score;
-warn Dumper $score->{ [ sort keys $score ]->[-1] };
+warn Dumper $score->{ [ sort keys %$score ]->[-1] };
 
 sub usage {
     return "perl $0 word dbname dbuser dbpass\n";
