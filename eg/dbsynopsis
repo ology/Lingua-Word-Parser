@@ -10,6 +10,7 @@ my $p = Lingua::Word::Parser->new(
   dbname => shift || 'word_part',
   dbuser => shift || die(usage()),
   dbpass => shift || die(usage()),
+#  dbtype => 'mysql', # <- Default
 );
 #warn Dumper $p->{lex};
 
