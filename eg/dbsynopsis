@@ -7,7 +7,7 @@ use Lingua::Word::Parser;
 
 my $p = Lingua::Word::Parser->new(
   word   => shift || 'abioticaly',
-  dbname => 'word_part',
+  dbname => shift || 'word_part',
   dbuser => shift || die(usage()),
   dbpass => shift || die(usage()),
 );
