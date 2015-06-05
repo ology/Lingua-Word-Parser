@@ -1,6 +1,9 @@
 Revision history for Lingua-Word-Parser
 
 {{$NEXT}}
+    - Allowed specification of separator and terminator strings for score output.
+
+0.0212 2015-01-21
     - Returned the definitions of the knowns in the score.
     - Fixed POD
 

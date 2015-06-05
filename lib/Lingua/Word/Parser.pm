@@ -10,7 +10,7 @@ use DBI;
 use Data::PowerSet;
 use IO::File;
 
-our $VERSION = '0.0211';
+our $VERSION = '0.0213';
 
 =head1 SYNOPSIS
 
