@@ -273,6 +273,9 @@ chunks or parts or "spans of adjacent characters."
 
 sub score {
     my $self = shift;
+    my ( $open_sparator, $close_separator, $line_terminator ) = @_;
+
+    $line_terminator = '' unless defined $line_terminator;
 
     # Visit each combination...
     my $i = 0;
@@ -300,13 +303,13 @@ sub score {
             $count{unknownc} += $unknownc;
         }
 
-        my ( $s, $m ) = reconstruct( $self->{word}, @$c );
+        my ( $s, $m ) = reconstruct( $self->{word}, $c, $open_sparator, $close_separator );
 #        $val .= "$count{knowns}:$count{unknowns} chunks / $count{knownc}:$count{unknownc} chars => "
 #          . join( ', ', @$s );
 #        warn "V:$val\n";
 
         my $key = "$count{knowns}:$count{unknowns} chunks / $count{knownc}:$count{unknownc} chars";
-        $val = join ', ', @$s;
+        $val = join ", $line_terminator", @$s;
 
         # TODO Re-model the knowns!!
         my $defn = '';
@@ -314,7 +317,7 @@ sub score {
         {
             for my $j ( keys %{ $self->{known} } )
             {
-                $defn .= $self->{known}{$j}{defn} . '. ' if $self->{known}{$j}{mask} eq $i;
+                $defn .= $self->{known}{$j}{defn} . ". $line_terminator" if $self->{known}{$j}{mask} eq $i;
             }
         }
 
@@ -423,34 +426,37 @@ Reconstruct the word, with delimiters around known combinations.
 =cut
 
 sub reconstruct {
-    my ( $word, @masks ) = @_;
+    my ( $word, $masks, $open_separator, $close_separator ) = @_;
 
-    my $strings = [];
-    my $masks   = [];
+    $open_separator  = '<' unless defined $open_separator;
+    $close_separator = '>' unless defined $close_separator;
 
-    for my $mask (reverse sort @masks) {
+    my $strings  = [];
+    my $my_masks = [];
+
+    for my $mask (reverse sort @$masks) {
         my $i = 0;
         my $last = 0;
         my $string  = '';
         for my $m ( split //, $mask ) {
             if ( $m ) {
-                $string .= '<' unless $last;
+                $string .= $open_separator unless $last;
                 $string .= substr( $word, $i, 1 );
                 $last = 1;
             }
             else {
-                $string .= '>' if $last;
+                $string .= $close_separator if $last;
                 $string .= substr( $word, $i, 1 );
                 $last = 0;
             }
             $i++;
         }
-        $string .= '>' if $last;
+        $string .= $close_separator if $last;
         push @$strings, $string;
-        push @$masks, $mask;
+        push @$my_masks, $mask;
     }
 
-    return $strings, $masks;
+    return $strings, $my_masks;
 }
 
 1;
