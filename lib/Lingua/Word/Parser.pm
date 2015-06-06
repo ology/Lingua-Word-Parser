@@ -48,8 +48,13 @@ Create a new C<Lingua::Word::Parser> object.
 
 Arguments and defaults:
 
-  word: undef
-  lex:  undef
+  word:   undef
+  lex:    undef
+  dbuser: undef
+  dbpass: undef
+  dbname: undef
+  dbtype: mysql
+  dbhost: localhost
 
 =cut
 
