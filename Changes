@@ -1,6 +1,9 @@
 Revision history for Lingua-Word-Parser
 
 {{$NEXT}}
+    - Improved documentation 
+
+0.03  2015-06-05
     - Allowed specification of separator and terminator strings for score output.
     - Improved documentation 
     - Improved tests
