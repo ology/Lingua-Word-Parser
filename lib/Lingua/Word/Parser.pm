@@ -19,22 +19,42 @@ our $VERSION = '0.03';
     word => 'abioticaly',
     file => 'eg/lexicon.dat',
  );
- # Or with a localhost database source:
- my $p = Lingua::Word::Parser->new(
+
+ # Or with a database source:
+ $p = Lingua::Word::Parser->new(
     word   => 'abioticaly',
     dbname => 'fragments',
     dbuser => 'akbar',
-    dbpass => '0p3n53454m3',
+    dbpass => 's3kr1+',
  );
+
  my ($known) = $p->knowns;
  my $combos  = $p->power;
  my $scored  = $p->score;
+
  # The best guess is the last sorted score-set:
  warn Dumper $scored->{ [ sort keys %$score ]->[-1] };
 
 =head1 DESCRIPTION
 
 A C<Lingua::Word::Parser> breaks a word into known affixes.
+
+A (word-part => regular-expression) lexicon file must have lines of
+the form:
+
+ a(?=\w)        opposite
+ ab(?=\w)       away
+ (?<=\w)o(?=\w) combining
+ (?<=\w)tic     possessing
+
+A database lexicon must have (affix, definition) records of the form:
+
+         affix     definition
+  -----------------------------
+         a(?=\w)   opposite
+         ab(?=\w)  away
+  (?<=\w)o(?=\w)   combining
+  (?<=\w)tic       possessing
 
 =cut
 
@@ -87,28 +107,15 @@ sub _init {
 
     # Set lex if given data.
     if ( $self->{file} && -e $self->{file} ) {
-        $self->fetch_lex;
+        $self->_fetch_lex;
     }
     elsif( $self->{dbname} )
     {
-        $self->db_fetch;
+        $self->_db_fetch;
     }
 }
 
-=head2 fetch_lex()
-
-Populate word-part => regular-expression lexicon.
-
-This file has lines of the form:
-
- a(?=\w) opposite
- ab(?=\w) away
- (?<=\w)o(?=\w) combining
- (?<=\w)tic possessing
-
-=cut
-
-sub fetch_lex {
+sub _fetch_lex {
     my $self = shift;
 
     # Open the given file for reading...
@@ -126,22 +133,7 @@ sub fetch_lex {
     return $self->{lex};
 }
 
-=head2 db_fetch()
-
-Populate the lexicon from a database source called C<`fragments`>.
-
-This database table has records of the form:
-
-         affix     definition
-  -----------------------------
-         a(?=\w)   opposite
-         ab(?=\w)  away
-  (?<=\w)o(?=\w)   combining
-  (?<=\w)tic       possessing
-
-=cut
-
-sub db_fetch {
+sub _db_fetch {
     my $self = shift;
 
     my $dsn = "DBI:$self->{dbtype}:$self->{dbname};$self->{dbhost}";
