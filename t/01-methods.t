@@ -21,7 +21,9 @@ my ($known) = $p->knowns;
 is keys %$known, 10, 'known';
 my $power = $p->power;
 is @$power, 215, 'power';
-my $score = $p->score;
-is @{ $score->{ [ sort keys %$score ]->[-1] } }, 2, 'score';
+my $score = $p->score( '[', ']', '|' );
+is @{ $score->{1111111111} }, 2, 'score';
+is $score->{1111111111}[0]{definition}, 'opposite. |life. |possessing. |opposite. |like. |', 'definition';
+is $score->{1111111111}[0]{partition}, '[a]bioticaly, |a[bio]ticaly, |abio[tic]aly, |abiotic[a]ly, |abiotica[ly]', 'partition';
 
 done_testing();
