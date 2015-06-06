@@ -10,7 +10,7 @@ use DBI;
 use Data::PowerSet;
 use IO::File;
 
-our $VERSION = '0.0213';
+our $VERSION = '0.03';
 
 =head1 SYNOPSIS
 
@@ -26,9 +26,9 @@ our $VERSION = '0.0213';
     dbuser => 'akbar',
     dbpass => '0p3n53454m3',
  );
- my ($known) = $p->knowns; #warn Dumper $known;
- my $combos  = $p->power;  #warn Dumper $combos;
- my $scored  = $p->score;  #warn Dumper $score;
+ my ($known) = $p->knowns;
+ my $combos  = $p->power;
+ my $scored  = $p->score;
  # The best guess is the last sorted score-set:
  warn Dumper $scored->{ [ sort keys %$score ]->[-1] };
 
@@ -246,7 +246,7 @@ sub power {
 #                warn "\tP:$compare v $mask\n";
 
                 # Skip this collection if an overlap is found.
-                if (not $self->does_not_overlap($compare, $mask)) {
+                if (not $self->_does_not_overlap($compare, $mask)) {
 #                    warn "\t\tO:$compare v $mask\n";
                     last LOOP;
                 }
@@ -266,8 +266,13 @@ sub power {
 
 =head2 score()
 
+  $score = $p->score( $open_sparator, $close_separator, $line_terminator );
+
 Score the known vs unknown word part combinations into ratios of characters and
 chunks or parts or "spans of adjacent characters."
+
+If not given, the B<$open_sparator>, B<$close_separator> and B<$line_terminator>
+are '<', '>' and '', by default, respectively.
 
 =cut
 
@@ -281,7 +286,7 @@ sub score {
     my $i = 0;
     for my $c (@{ $self->{combos} }) {
         $i++;
-        my $together = $self->or_together(@$c);
+        my $together = $self->_or_together(@$c);
 
         # Breakdown knowns vs unknowns and knowncharacters vs unknowncharacters.
         my %count = (
@@ -293,8 +298,8 @@ sub score {
         my $val = '';
         for my $x ( reverse sort @$c ) {
             # Run-length encode an "un-digitized" string.
-            my $y = rle($x);
-            my ( $knowns, $unknowns, $knownc, $unknownc ) = grouping($y);
+            my $y = _rle($x);
+            my ( $knowns, $unknowns, $knownc, $unknownc ) = _grouping($y);
 #            $val .= "$x ($y)[$knowns/$unknowns | $knownc/$unknownc] ";
             # Accumulate the counters!
             $count{knowns}   += $knowns;
@@ -303,7 +308,7 @@ sub score {
             $count{unknownc} += $unknownc;
         }
 
-        my ( $s, $m ) = reconstruct( $self->{word}, $c, $open_sparator, $close_separator );
+        my ( $s, $m ) = _reconstruct( $self->{word}, $c, $open_sparator, $close_separator );
 #        $val .= "$count{knowns}:$count{unknowns} chunks / $count{knownc}:$count{unknownc} chars => "
 #          . join( ', ', @$s );
 #        warn "V:$val\n";
@@ -327,13 +332,7 @@ sub score {
     return $self->{score};
 }
 
-=head2 grouping()
-
-Make groups of "un-digitized" strings where B<k> = known and B<u> = unknown.
-
-=cut
-
-sub grouping {
+sub _grouping {
     my $scored = shift;
     my @groups = $scored =~ /([ku]\d+)/g;
     my ( $knowns, $unknowns ) = ( 0, 0 );
@@ -351,13 +350,7 @@ sub grouping {
     return $knowns, $unknowns, $knownc, $unknownc;
 }
 
-=head2 rle()
-
-Compress B<k>/B<u> strings into contiguous chunks.
-
-=cut
-
-sub rle {
+sub _rle {
     my $scored = shift;
     # Run-length encode an "un-digitized" string.
     $scored =~ s/1/k/g; # Undigitize
@@ -367,13 +360,7 @@ sub rle {
     return $scored;
 }
 
-=head2 does_not_overlap()
-
-Compute whether the given masks overlap.
-
-=cut
-
-sub does_not_overlap {
+sub _does_not_overlap {
     my $self = shift;
 
     # Get our masks to check.
@@ -392,13 +379,7 @@ sub does_not_overlap {
     return $xorclone->equal($orclone) ? $orclone->to_Bin : 0;
 }
 
-=head2 or_together()
-
-Combine a list of bitmasks.
-
-=cut
-
-sub or_together {
+sub _or_together {
     my $self = shift;
 
     # Get our masks to score.
@@ -419,13 +400,7 @@ sub or_together {
     return $result->to_Bin;
 }
 
-=head2 reconstruct()
-
-Reconstruct the word, with delimiters around known combinations.
-
-=cut
-
-sub reconstruct {
+sub _reconstruct {
     my ( $word, $masks, $open_separator, $close_separator ) = @_;
 
     $open_separator  = '<' unless defined $open_separator;
