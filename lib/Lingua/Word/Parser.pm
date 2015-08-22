@@ -297,7 +297,7 @@ sub score {
   $score = $p->score_parts( $open_sparator, $close_separator );
 
 Score the known vs unknown word part combinations into ratios of characters and
-chunks or parts or "spans of adjacent characters" as a collection of strings.
+chunks or parts or "spans of adjacent characters."
 
 If not given, the B<$open_sparator> and B<$close_separator> are '<' and '>' by
 default.
