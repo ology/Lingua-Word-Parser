@@ -30,6 +30,7 @@ our $VERSION = '0.0301';
 
  my ($known) = $p->knowns;
  my $combos  = $p->power;
+ my $parts   = $p->score_parts;
  my $scored  = $p->score;
 
  # The best guess is the last sorted score-set:
@@ -266,14 +267,44 @@ sub power {
   $score = $p->score( $open_sparator, $close_separator, $line_terminator );
 
 Score the known vs unknown word part combinations into ratios of characters and
-chunks or parts or "spans of adjacent characters."
+chunks or parts or "spans of adjacent characters" B<as a collection of strings>.
 
-If not given, the B<$open_sparator>, B<$close_separator> and B<$line_terminator>
-are '<', '>' and '', by default, respectively.
+If not given, the B<$open_sparator> and B<$close_separator> are '<' and '>' by
+default.
 
 =cut
 
 sub score {
+    my $self = shift;
+    my ( $open_sparator, $close_separator ) = @_;
+
+    my $parts = $self->score_parts( $open_sparator, $close_separator );
+
+    for my $mask ( keys %$parts ) {
+        for my $element ( @{ $parts->{$mask} } ) {
+            my $key  = "$element->{score}{knowns}:$element->{score}{unknowns} chunks / $element->{score}{knownc}:$element->{score}{unknownc} chars";
+            my $val  = join ', ', @{ $element->{partition} };
+            my $defn = join ', ', @{ $element->{definition} };
+            push @{ $self->{score}{$mask} }, { score => $key, partition => $val, definition => $defn };
+        }
+    }
+
+    return $self->{score};
+}
+
+=head2 score_parts()
+
+  $score = $p->score_parts( $open_sparator, $close_separator );
+
+Score the known vs unknown word part combinations into ratios of characters and
+chunks or parts or "spans of adjacent characters" as a collection of strings.
+
+If not given, the B<$open_sparator> and B<$close_separator> are '<' and '>' by
+default.
+
+=cut
+
+sub score_parts {
     my $self = shift;
     my ( $open_sparator, $close_separator, $line_terminator ) = @_;
 
@@ -292,12 +323,11 @@ sub score {
             knownc   => 0,
             unknownc => 0,
         );
-        my $val = '';
+
         for my $x ( reverse sort @$c ) {
             # Run-length encode an "un-digitized" string.
             my $y = _rle($x);
             my ( $knowns, $unknowns, $knownc, $unknownc ) = _grouping($y);
-#            $val .= "$x ($y)[$knowns/$unknowns | $knownc/$unknownc] ";
             # Accumulate the counters!
             $count{knowns}   += $knowns;
             $count{unknowns} += $unknowns;
@@ -306,27 +336,21 @@ sub score {
         }
 
         my ( $s, $m ) = _reconstruct( $self->{word}, $c, $open_sparator, $close_separator );
-#        $val .= "$count{knowns}:$count{unknowns} chunks / $count{knownc}:$count{unknownc} chars => "
-#          . join( ', ', @$s );
-#        warn "V:$val\n";
 
-        my $key = "$count{knowns}:$count{unknowns} chunks / $count{knownc}:$count{unknownc} chars";
-        $val = join ", $line_terminator", @$s;
-
-        # TODO Re-model the knowns!!
-        my $defn = '';
+        my $defn = [];
         for my $i ( @$m )
         {
             for my $j ( keys %{ $self->{known} } )
             {
-                $defn .= $self->{known}{$j}{defn} . ". $line_terminator" if $self->{known}{$j}{mask} eq $i;
+                push @$defn, $self->{known}{$j}{defn} if $self->{known}{$j}{mask} eq $i;
             }
         }
 
-        push @{ $self->{score}{$together} }, { score => $key, partition => $val, definition => $defn };
+        push @{ $self->{score_parts}{$together} },
+            { score => \%count, partition => $s, definition => $defn };
     }
 
-    return $self->{score};
+    return $self->{score_parts};
 }
 
 sub _grouping {
