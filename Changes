@@ -1,6 +1,9 @@
 Revision history for Lingua-Word-Parser
 
 {{$NEXT}}
+    - Reduce time footprint with List::PowerSet and Memoize.
+
+0.04  2015-08-22
     - Added the extra-handy score_parts() method.
 
 0.0301 2015-06-05
