@@ -34,7 +34,7 @@ our $VERSION = '0.04';
  my $scored  = $p->score;
 
  # The best guess is the last sorted score-set:
- warn Dumper $scored->{ [ sort keys %$score ]->[-1] };
+ warn Dumper $scored->{ [ sort keys %$scored ]->[-1] };
 
 =head1 DESCRIPTION
 
