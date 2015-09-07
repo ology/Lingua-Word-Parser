@@ -7,10 +7,19 @@ use warnings;
 
 use Bit::Vector;
 use DBI;
-use Data::PowerSet;
+use List::PowerSet qw( powerset_lazy );
 use IO::File;
 
-our $VERSION = '0.04';
+use Memoize;
+memoize('_does_not_overlap');
+memoize('power');
+memoize('_reconstruct');
+memoize('_grouping');
+memoize('score_parts');
+memoize('_rle');
+memoize('_or_together');
+
+our $VERSION = '0.05';
 
 =head1 SYNOPSIS
 
@@ -218,10 +227,10 @@ sub power {
     my $self = shift;
 
     # Get a new powerset generator.
-    my $power = Data::PowerSet->new(sort keys %{ $self->{masks} });
+    my $power = powerset_lazy(sort keys %{ $self->{masks} });
 
     # Consider each member of the powerset.. to save or skip?
-    while (my $collection = $power->next) {
+    while (my $collection = $power->()) {
 #        warn "C: @$collection\n";
 
         # Save this collection if it has only one item.
