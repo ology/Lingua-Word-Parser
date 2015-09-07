@@ -473,4 +473,6 @@ L<Lingua::TokenParse> - The predecessor of this module.
 
 L<http://en.wikipedia.org/wiki/Affix> is the tip of the iceberg...
 
+L<https://github.com/ology/Word-Part> a friendly L<Dancer> user interface.
+
 =cut
