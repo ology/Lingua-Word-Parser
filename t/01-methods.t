@@ -30,4 +30,7 @@ is $score->{1111111111}[0]{partition},
     '[a]bioticaly, a[bio]ticaly, abio[tic]aly, abiotic[a]ly, abiotica[ly]',
     'partition';
 
+is Lingua::Word::Parser::_rle('01'), 'u1k1', '_rle';
+is Lingua::Word::Parser::_rle('0011'), 'u2k2', '_rle';
+
 done_testing();
