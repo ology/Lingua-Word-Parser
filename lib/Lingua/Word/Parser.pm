@@ -386,7 +386,7 @@ sub _rle {
     $scored =~ s/1/k/g; # Undigitize
     $scored =~ s/0/u/g; # "
     # Count contiguous chars.
-    $scored =~ s/(.)\1*/$1. length $&/ge;
+    $scored =~ s/(.)\1*/$1 . length(substr($scored, $-[0], $+[0]-$-[0]))/ge;
     return $scored;
 }
 
