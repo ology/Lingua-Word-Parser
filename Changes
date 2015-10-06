@@ -1,6 +1,10 @@
 Revision history for Lingua-Word-Parser
 
 {{$NEXT}}
+    - Reduce footprint by not using the $& variable.
+    - Add _rle() tests.
+
+0.05  2015-09-07
     - Reduce time footprint with List::PowerSet and Memoize.
 
 0.04  2015-08-22
