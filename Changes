@@ -1,6 +1,10 @@
 Revision history for Lingua-Word-Parser
 
 {{$NEXT}}
+    - Remove the superfluous masks return from the knowns() method.
+    - Improved documentation.
+
+0.06  2015-10-06
     - Reduce footprint by not using the $& variable.
     - Add _rle() tests.
     - Improved documentation.
