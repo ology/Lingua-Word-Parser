@@ -5,6 +5,8 @@ package Lingua::Word::Parser;
 use strict;
 use warnings;
 
+our $VERSION = '0.06';
+
 use Bit::Vector;
 use DBI;
 use List::PowerSet qw( powerset_lazy );
@@ -18,8 +20,6 @@ memoize('_grouping');
 memoize('score_parts');
 memoize('_rle');
 memoize('_or_together');
-
-our $VERSION = '0.05';
 
 =head1 SYNOPSIS
 
