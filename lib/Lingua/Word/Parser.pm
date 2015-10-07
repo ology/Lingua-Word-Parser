@@ -322,7 +322,7 @@ chunks (spans of adjacent characters).
 If not given, the B<$open_sparator> and B<$close_separator> are '<' and '>' by
 default.
 
-The line terminator can be any string, like a newline (C<\n> or an HTML
+The B<$line_terminator> can be any string, like a newline (C<\n> or an HTML
 line-break), but is the empty string (C<''>) by default.
 
 =cut
