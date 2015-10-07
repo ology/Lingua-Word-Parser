@@ -1,6 +1,8 @@
 Revision history for Lingua-Word-Parser
 
 {{$NEXT}}
+
+0.07  2015-10-06
     - Remove the superfluous masks return from the knowns() method.
     - Improved documentation.
 
