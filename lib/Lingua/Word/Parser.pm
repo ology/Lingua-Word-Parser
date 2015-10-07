@@ -56,7 +56,7 @@ the form:
  (?<=\w)o(?=\w) combining
  (?<=\w)tic     possessing
 
-Please see the inculded F<eg/lexicon.dat> file.
+Please see the included F<eg/lexicon.dat> file.
 
 A database lexicon must have records of the form:
 
@@ -67,7 +67,7 @@ A database lexicon must have records of the form:
   (?<=\w)o(?=\w)   combining
   (?<=\w)tic       possessing
 
-Please see the inculded F<eg/word_part.sql> file.
+Please see the included F<eg/word_part.sql> file.
 
 =cut
 
