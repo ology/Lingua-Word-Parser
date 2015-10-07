@@ -5,7 +5,7 @@ package Lingua::Word::Parser;
 use strict;
 use warnings;
 
-our $VERSION = '0.06';
+our $VERSION = '0.07';
 
 use Bit::Vector;
 use DBI;
@@ -37,13 +37,12 @@ memoize('_or_together');
     dbpass => 's3kr1+',
  );
 
- my ($known, $masks) = $p->knowns;
- my $combos  = $p->power;
- my $parts   = $p->score_parts;
- my $scored  = $p->score;
+ my $known  = $p->knowns;
+ my $combos = $p->power;
+ my $parts  = $p->score_parts;
 
- # The best guess is the last sorted score-set:
- warn Dumper $scored->{ [ sort keys %$scored ]->[-1] };
+ # The best guess is the last sorted scored set:
+ print Dumper $scored->{ [ sort keys %$scored ]->[-1] };
 
 =head1 DESCRIPTION
 
@@ -57,6 +56,8 @@ the form:
  (?<=\w)o(?=\w) combining
  (?<=\w)tic     possessing
 
+Please see the inculded F<eg/lexicon.dat> file.
+
 A database lexicon must have records of the form:
 
          affix     definition
@@ -65,6 +66,8 @@ A database lexicon must have records of the form:
          ab(?=\w)  away
   (?<=\w)o(?=\w)   combining
   (?<=\w)tic       possessing
+
+Please see the inculded F<eg/word_part.sql> file.
 
 =cut
 
@@ -168,6 +171,8 @@ sub _db_fetch {
 
 =head2 knowns()
 
+ my $known = $p->knowns;
+
 Find the known word parts and their bitstring masks.
 
 =cut
@@ -208,17 +213,21 @@ sub knowns {
                 defn => $i->{defn},
                 mask => $mask,
             };
+
             # Save the relationship between mask and id.
             $self->{masks}{$mask} = $id++;
         }
     }
 
-    return $self->{known}, $self->{masks};
+    return $self->{known};
 }
 
 =head2 power()
 
-Find the powerset of non-overlapping known word parts.
+ my $combos = $p->power();
+
+Find the set of non-overlapping known word parts by considering the power set of
+all masks.
 
 =cut
 
