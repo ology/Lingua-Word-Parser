@@ -489,4 +489,6 @@ L<http://en.wikipedia.org/wiki/Affix> is the tip of the iceberg...
 
 L<https://github.com/ology/Word-Part> a friendly L<Dancer> user interface.
 
+The F<t/*> and F<eg/*> files in this distribution.
+
 =cut
