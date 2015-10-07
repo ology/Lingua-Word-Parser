@@ -37,7 +37,7 @@ memoize('_or_together');
     dbpass => 's3kr1+',
  );
 
- my ($known) = $p->knowns;
+ my ($known, $masks) = $p->knowns;
  my $combos  = $p->power;
  my $parts   = $p->score_parts;
  my $scored  = $p->score;
@@ -57,7 +57,7 @@ the form:
  (?<=\w)o(?=\w) combining
  (?<=\w)tic     possessing
 
-A database lexicon must have (affix, definition) records of the form:
+A database lexicon must have records of the form:
 
          affix     definition
   -----------------------------
@@ -79,7 +79,6 @@ Create a new C<Lingua::Word::Parser> object.
 Arguments and defaults:
 
   word:   undef
-  lex:    undef
   dbuser: undef
   dbpass: undef
   dbname: undef
@@ -169,14 +168,14 @@ sub _db_fetch {
 
 =head2 knowns()
 
-Fingerprint the known word parts.
+Find the known word parts and their bitstring masks.
 
 =cut
 
 sub knowns {
     my $self = shift;
 
-    # TODO What is this?
+    # The identifier for the known and masks lists.
     my $id = 0;
 
     for my $i (values %{ $self->{lex} }) {
@@ -219,7 +218,7 @@ sub knowns {
 
 =head2 power()
 
-Find the "non-overlapping powerset."
+Find the powerset of non-overlapping known word parts.
 
 =cut
 
@@ -273,7 +272,8 @@ sub power {
 
 =head2 score()
 
-  $score = $p->score( $open_sparator, $close_separator, $line_terminator );
+  $score = $p->score();
+  $score = $p->score( $open_sparator, $close_separator);
 
 Score the known vs unknown word part combinations into ratios of characters and
 chunks or parts or "spans of adjacent characters" B<as a collection of strings>.
@@ -303,13 +303,18 @@ sub score {
 
 =head2 score_parts()
 
-  $score = $p->score_parts( $open_sparator, $close_separator );
+  $score_parts = $p->score_parts();
+  $score_parts = $p->score_parts( $open_sparator, $close_separator );
+  $score_parts = $p->score_parts( $open_sparator, $close_separator, $line_terminator );
 
 Score the known vs unknown word part combinations into ratios of characters and
-chunks or parts or "spans of adjacent characters."
+chunks (spans of adjacent characters).
 
 If not given, the B<$open_sparator> and B<$close_separator> are '<' and '>' by
 default.
+
+The line terminator can be any string, like a newline (C<\n> or an HTML
+line-break), but is the empty string (C<''>) by default.
 
 =cut
 
