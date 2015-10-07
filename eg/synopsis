@@ -12,8 +12,9 @@ my $p = Lingua::Word::Parser->new(
 #warn Dumper $p->{lex};
 
 # Find the known word-part positions.
-my ($known) = $p->knowns;
+my ($known, $masks) = $p->knowns;
 #warn Dumper $known;
+#warn Dumper $masks;
 my $combos = $p->power;
 #warn Dumper $combos;
 my $score = $p->score('[', ']', '</br>');
