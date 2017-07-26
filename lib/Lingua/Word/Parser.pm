@@ -5,7 +5,7 @@ package Lingua::Word::Parser;
 use strict;
 use warnings;
 
-our $VERSION = '0.0803';
+our $VERSION = '0.0804';
 
 use Bit::Vector;
 use DBI;
