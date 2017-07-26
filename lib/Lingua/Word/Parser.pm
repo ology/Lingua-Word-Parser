@@ -282,7 +282,7 @@ sub power {
   $score = $p->score( $open_separator, $close_separator);
 
 Score the known vs unknown word part combinations into ratios of characters and
-chunks or parts or "spans of adjacent characters" B<as a collection of strings>.
+chunks, word familiarity, partitions and deefinitions.
 
 This method sets the B<score> member to a list of hashrefs with keys:
 
@@ -350,7 +350,7 @@ sub _familiarity {
   $score_parts = $p->score_parts( $open_separator, $close_separator, $line_terminator );
 
 Score the known vs unknown word part combinations into ratios of characters and
-chunks (spans of adjacent characters).
+chunks, word familiarity, paritions and definitions.
 
 If not given, the B<$open_separator> and B<$close_separator> are '<' and '>' by
 default.
