@@ -6,8 +6,8 @@ use Data::Dumper;
 use Lingua::Word::Parser;
 
 my $p = Lingua::Word::Parser->new(
-  file => 'eg/lexicon.dat',
   word => shift || 'abioticaly',
+  file => 'eg/lexicon.dat',
 );
 #warn Dumper $p->{lex};
 
