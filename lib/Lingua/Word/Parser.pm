@@ -332,7 +332,7 @@ sub score {
 sub _familiarity {
     my ( $self, $mask ) = @_;
 
-    my @chunks = split /(0+)/, $mask;
+    my @chunks = grep { $_ ne "" } split /(0+)/, $mask;
 
     # Figure out how many chars are only 1s and
     # Figure out how many chunks are made up of 1s:
