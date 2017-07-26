@@ -1,7 +1,7 @@
 Revision history for Lingua-Word-Parser
 
 {{$NEXT}}
-    - 
+    - Test score_parts() not the score() method.
 
 0.0802 2017-07-25
     - Add a crucial grep to exclude chunks that are the empty string.
