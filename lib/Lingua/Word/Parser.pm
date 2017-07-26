@@ -5,7 +5,7 @@ package Lingua::Word::Parser;
 use strict;
 use warnings;
 
-our $VERSION = '0.08';
+our $VERSION = '0.0801';
 
 use Bit::Vector;
 use DBI;
@@ -406,7 +406,7 @@ sub score_parts {
         }
 
         push @{ $self->{score_parts}{$together} },
-            { score => \%count, partition => $s, definition => $defn };
+            { score => \%count, partition => $s, definition => $defn, familiarity => $self->_familiarity($together) };
     }
 
     return $self->{score_parts};
