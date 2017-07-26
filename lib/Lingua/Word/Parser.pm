@@ -1,11 +1,11 @@
 package Lingua::Word::Parser;
 
-# ABSTRACT: Parse a word into known and unknown parts
+# ABSTRACT: Parse a word into scored known and unknown parts
 
 use strict;
 use warnings;
 
-our $VERSION = '0.0802';
+our $VERSION = '0.0803';
 
 use Bit::Vector;
 use DBI;
