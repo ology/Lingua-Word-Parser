@@ -52,26 +52,19 @@ memoize('_or_together');
 
 A C<Lingua::Word::Parser> breaks a word into known affixes.
 
-A (word-part => regular-expression) lexicon file must have lines of
-the form:
+A word-part lexicon file must have "regular-expression definition"
+lines of the form:
 
  a(?=\w)        opposite
  ab(?=\w)       away
  (?<=\w)o(?=\w) combining
  (?<=\w)tic     possessing
 
-Please see the included F<eg/lexicon.dat> file.
+Please see the included F<eg/lexicon.dat> example file.
 
-A database lexicon must have records of the form:
-
-         affix     definition
-  -----------------------------
-         a(?=\w)   opposite
-         ab(?=\w)  away
-  (?<=\w)o(?=\w)   combining
-  (?<=\w)tic       possessing
-
-Please see the included F<eg/word_part.sql> file.
+A database lexicon must have records as above, but with the column
+names, B<affix> and B<definition>.  Please see the included
+F<eg/word_part.sql> example file.
 
 =cut
 
