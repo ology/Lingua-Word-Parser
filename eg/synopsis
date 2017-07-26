@@ -17,6 +17,7 @@ my ($known, $masks) = $p->knowns;
 #warn Dumper $masks;
 my $combos = $p->power;
 #warn Dumper $combos;
-my $score = $p->score();
+my $score = $p->score;    # Stringified output
+#my $score = $p->score_parts; # "Raw" output
 #warn Dumper $score;
 warn Dumper $score->{ [ sort keys %$score ]->[-1] };
