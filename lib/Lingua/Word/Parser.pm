@@ -405,8 +405,12 @@ sub score_parts {
             }
         }
 
-        push @{ $self->{score_parts}{$together} },
-            { score => \%count, partition => $s, definition => $defn, familiarity => $self->_familiarity($together) };
+        push @{ $self->{score_parts}{$together} }, {
+            score       => \%count,
+            partition   => $s,
+            definition  => $defn,
+            familiarity => $self->_familiarity($together),
+        };
     }
 
     return $self->{score_parts};
