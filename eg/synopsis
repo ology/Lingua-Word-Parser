@@ -17,6 +17,6 @@ my ($known, $masks) = $p->knowns;
 #warn Dumper $masks;
 my $combos = $p->power;
 #warn Dumper $combos;
-my $score = $p->score('[', ']', '</br>');
+my $score = $p->score();
 #warn Dumper $score;
 warn Dumper $score->{ [ sort keys %$score ]->[-1] };
