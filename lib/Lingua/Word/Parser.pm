@@ -306,7 +306,7 @@ sub score {
     my $parts = $self->score_parts( $open_separator, $close_separator );
 
     for my $mask ( keys %$parts ) {
-        my $familiarity = sprintf "%.2f chunks / %.2f chars %s", @{ $self->_familiarity($mask) }, $mask;
+        my $familiarity = sprintf "%.2f chunks / %.2f chars", @{ $self->_familiarity($mask) };
 
         for my $element ( @{ $parts->{$mask} } ) {
             my $score = sprintf "%d:%d chunks / %d:%d chars",
