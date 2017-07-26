@@ -25,25 +25,28 @@ memoize('_or_together');
 =head1 SYNOPSIS
 
  use Lingua::Word::Parser;
- my $p = Lingua::Word::Parser->new(
-    word => 'abioticaly',
-    file => 'eg/lexicon.dat',
- );
 
- # Or with a database source:
- $p = Lingua::Word::Parser->new(
+ # With a database source:
+ my $p = Lingua::Word::Parser->new(
     word   => 'abioticaly',
     dbname => 'fragments',
     dbuser => 'akbar',
     dbpass => 's3kr1+',
  );
 
+ # With a file source:
+ $p = Lingua::Word::Parser->new(
+    word => 'abioticaly',
+    file => 'eg/lexicon.dat',
+ );
+
  my $known  = $p->knowns;
  my $combos = $p->power;
- my $parts  = $p->score_parts;
+ my $score  = $p->score;    # Stringified output
+ #my $score  = $p->score_parts; # "Raw" output
 
  # The best guess is the last sorted scored set:
- print Dumper $scored->{ [ sort keys %$scored ]->[-1] };
+ print Dumper $score->{ [ sort keys %$score ]->[-1] };
 
 =head1 DESCRIPTION
 
