@@ -2,7 +2,7 @@
 use strict;
 use warnings;
 
-use Data::Dumper::Concise;
+use Data::Dumper;
 use Lingua::Word::Parser;
 
 my $p = Lingua::Word::Parser->new(
