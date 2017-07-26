@@ -287,6 +287,13 @@ sub power {
 Score the known vs unknown word part combinations into ratios of characters and
 chunks or parts or "spans of adjacent characters" B<as a collection of strings>.
 
+This method sets the B<score> member to a list of hashrefs with keys:
+
+  partition
+  definition
+  score
+  familiarity
+
 If not given, the B<$open_sparator> and B<$close_separator> are '<' and '>' by
 default.
 
@@ -300,14 +307,43 @@ sub score {
 
     for my $mask ( keys %$parts ) {
         for my $element ( @{ $parts->{$mask} } ) {
-            my $key  = "$element->{score}{knowns}:$element->{score}{unknowns} chunks / $element->{score}{knownc}:$element->{score}{unknownc} chars";
-            my $val  = join ', ', @{ $element->{partition} };
+            my $score = sprintf "%d:%d chunks / %d:%d chars",
+                $element->{score}{knowns}, $element->{score}{unknowns},
+                $element->{score}{knownc}, $element->{score}{unknownc};
+
+            my $familiarity = sprintf "%.2f chunks / %.2f chars", @{ $self->_familiarity($mask) };
+
+            my $part = join ', ', @{ $element->{partition} };
+
             my $defn = join ', ', @{ $element->{definition} };
-            push @{ $self->{score}{$mask} }, { score => $key, partition => $val, definition => $defn };
+
+            push @{ $self->{score}{$mask} }, {
+                score       => $score,
+                familiarity => $familiarity,
+                partition   => $part,
+                definition  => $defn,
+            };
         }
     }
 
     return $self->{score};
+}
+
+sub _familiarity {
+    my ( $self, $mask ) = @_;
+
+    my @chunks = split /(0+)/, $mask;
+
+    # Figure out how many chars are only 1s and
+    # Figure out how many chunks are made up of 1s:
+    my $char_1s = 0;
+    my $chunk_1s = 0;
+    for my $chunk (@chunks) {
+        $char_1s  += $chunk =~ /0/ ? 0 : length($chunk);
+        $chunk_1s += $chunk =~ /0/ ? 0 : 1;
+    }
+
+    return [ $chunk_1s / @chunks, $char_1s / length($mask) ];
 }
 
 =head2 score_parts()
