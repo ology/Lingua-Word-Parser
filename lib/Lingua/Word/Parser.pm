@@ -17,6 +17,7 @@ memoize('_does_not_overlap');
 memoize('power');
 memoize('_reconstruct');
 memoize('_grouping');
+memoize('score');
 memoize('score_parts');
 memoize('_rle');
 memoize('_or_together');
