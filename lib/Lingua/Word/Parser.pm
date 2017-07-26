@@ -282,7 +282,7 @@ sub power {
 =head2 score()
 
   $score = $p->score();
-  $score = $p->score( $open_sparator, $close_separator);
+  $score = $p->score( $open_separator, $close_separator);
 
 Score the known vs unknown word part combinations into ratios of characters and
 chunks or parts or "spans of adjacent characters" B<as a collection of strings>.
@@ -294,16 +294,16 @@ This method sets the B<score> member to a list of hashrefs with keys:
   score
   familiarity
 
-If not given, the B<$open_sparator> and B<$close_separator> are '<' and '>' by
+If not given, the B<$open_separator> and B<$close_separator> are '<' and '>' by
 default.
 
 =cut
 
 sub score {
     my $self = shift;
-    my ( $open_sparator, $close_separator ) = @_;
+    my ( $open_separator, $close_separator ) = @_;
 
-    my $parts = $self->score_parts( $open_sparator, $close_separator );
+    my $parts = $self->score_parts( $open_separator, $close_separator );
 
     for my $mask ( keys %$parts ) {
         for my $element ( @{ $parts->{$mask} } ) {
@@ -349,13 +349,13 @@ sub _familiarity {
 =head2 score_parts()
 
   $score_parts = $p->score_parts();
-  $score_parts = $p->score_parts( $open_sparator, $close_separator );
-  $score_parts = $p->score_parts( $open_sparator, $close_separator, $line_terminator );
+  $score_parts = $p->score_parts( $open_separator, $close_separator );
+  $score_parts = $p->score_parts( $open_separator, $close_separator, $line_terminator );
 
 Score the known vs unknown word part combinations into ratios of characters and
 chunks (spans of adjacent characters).
 
-If not given, the B<$open_sparator> and B<$close_separator> are '<' and '>' by
+If not given, the B<$open_separator> and B<$close_separator> are '<' and '>' by
 default.
 
 The B<$line_terminator> can be any string, like a newline (C<\n> or an HTML
@@ -365,7 +365,7 @@ line-break), but is the empty string (C<''>) by default.
 
 sub score_parts {
     my $self = shift;
-    my ( $open_sparator, $close_separator, $line_terminator ) = @_;
+    my ( $open_separator, $close_separator, $line_terminator ) = @_;
 
     $line_terminator = '' unless defined $line_terminator;
 
@@ -394,7 +394,7 @@ sub score_parts {
             $count{unknownc} += $unknownc;
         }
 
-        my ( $s, $m ) = _reconstruct( $self->{word}, $c, $open_sparator, $close_separator );
+        my ( $s, $m ) = _reconstruct( $self->{word}, $c, $open_separator, $close_separator );
 
         my $defn = [];
         for my $i ( @$m )
