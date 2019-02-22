@@ -24,29 +24,29 @@ memoize('_or_together');
 
 =head1 SYNOPSIS
 
- use Lingua::Word::Parser;
+  use Lingua::Word::Parser;
 
- # With a database source:
- my $p = Lingua::Word::Parser->new(
+  # With a database source:
+  my $p = Lingua::Word::Parser->new(
     word   => 'abioticaly',
     dbname => 'fragments',
     dbuser => 'akbar',
     dbpass => 's3kr1+',
- );
+  );
 
- # With a file source:
- $p = Lingua::Word::Parser->new(
+  # With a file source:
+  $p = Lingua::Word::Parser->new(
     word => 'abioticaly',
     file => 'eg/lexicon.dat',
- );
+  );
 
- my $known  = $p->knowns;
- my $combos = $p->power;
- my $score  = $p->score;    # Stringified output
- #my $score  = $p->score_parts; # "Raw" output
+  my $known  = $p->knowns;
+  my $combos = $p->power;
+  my $score  = $p->score;    # Stringified output
+  #my $score  = $p->score_parts; # "Raw" output
 
- # The best guess is the last sorted scored set:
- print Dumper $score->{ [ sort keys %$score ]->[-1] };
+  # The best guess is the last sorted scored set:
+  print Dumper $score->{ [ sort keys %$score ]->[-1] };
 
 =head1 DESCRIPTION
 
@@ -55,10 +55,10 @@ A C<Lingua::Word::Parser> breaks a word into known affixes.
 A word-part lexicon file must have "regular-expression definition"
 lines of the form:
 
- a(?=\w)        opposite
- ab(?=\w)       away
- (?<=\w)o(?=\w) combining
- (?<=\w)tic     possessing
+  a(?=\w)        opposite
+  ab(?=\w)       away
+  (?<=\w)o(?=\w) combining
+  (?<=\w)tic     possessing
 
 Please see the included F<eg/lexicon.dat> example file.
 
@@ -72,7 +72,7 @@ F<eg/word_part.sql> example file.
 
 =head2 new()
 
-  $x = Lingua::Word::Parser->new(%arguments);
+  $p = Lingua::Word::Parser->new(%arguments);
 
 Create a new C<Lingua::Word::Parser> object.
 
@@ -168,7 +168,7 @@ sub _db_fetch {
 
 =head2 knowns()
 
- my $known = $p->knowns;
+  $known = $p->knowns;
 
 Find the known word parts and their bitstring masks.
 
@@ -221,7 +221,7 @@ sub knowns {
 
 =head2 power()
 
- my $combos = $p->power();
+  $combos = $p->power();
 
 Find the set of non-overlapping known word parts by considering the power set of
 all masks.
