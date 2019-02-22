@@ -42,8 +42,8 @@ memoize('_or_together');
 
   my $known  = $p->knowns;
   my $combos = $p->power;
-  my $score  = $p->score;    # Stringified output
-  #my $score  = $p->score_parts; # "Raw" output
+  my $score  = $p->score;       # Stringified output
+  $score     = $p->score_parts; # "Raw" output
 
   # The best guess is the last sorted scored set:
   print Dumper $score->{ [ sort keys %$score ]->[-1] };
