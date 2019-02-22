@@ -1,6 +1,8 @@
 Revision history for Lingua-Word-Parser
 
 {{$NEXT}}
+    - Clean up test file and add more cases.
+    - Improve documentation ever-so-slightly.
 
 0.0804 2017-07-26
     - Improve documentation.
