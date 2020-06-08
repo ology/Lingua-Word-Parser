@@ -56,7 +56,7 @@ is_deeply $x->{definition},
     'definition';
 
 $score = $p->score;
-my $x = $score->{$mask}[-1];
+$x = $score->{$mask}[-1];
 is $x->{score}, '6:10 chunks / 10:50 chars', 'score';
 is $x->{familiarity}, '1.00 chunks / 1.00 chars', 'familiarity';
 is $x->{partition},
