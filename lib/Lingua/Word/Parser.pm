@@ -70,7 +70,7 @@ F<eg/word_part.sql> example file.
 
 =head1 METHODS
 
-=head2 new()
+=head2 new
 
   $p = Lingua::Word::Parser->new(%arguments);
 
@@ -128,7 +128,7 @@ sub _fetch_lex {
     my $self = shift;
 
     # Open the given file for reading...
-    my $fh = IO::File->new();
+    my $fh = IO::File->new;
     $fh->open( "< $self->{file}" ) or die "Can't read file: '$self->{file}'";
     for ( <$fh> ) {
         # Split space-separated entries.
@@ -166,7 +166,7 @@ sub _db_fetch {
     $dbh->disconnect or die "Unable to disconnect from $self->{dbname}: $DBI::errstr\n";
 }
 
-=head2 knowns()
+=head2 knowns
 
   $known = $p->knowns;
 
@@ -219,9 +219,9 @@ sub knowns {
     return $self->{known};
 }
 
-=head2 power()
+=head2 power
 
-  $combos = $p->power();
+  $combos = $p->power;
 
 Find the set of non-overlapping known word parts by considering the power set of
 all masks.
@@ -276,9 +276,9 @@ sub power {
     return $self->{combos};
 }
 
-=head2 score()
+=head2 score
 
-  $score = $p->score();
+  $score = $p->score;
   $score = $p->score( $open_separator, $close_separator);
 
 Score the known vs unknown word part combinations into ratios of characters and
@@ -343,9 +343,9 @@ sub _familiarity {
     return [ $chunk_1s / @chunks, $char_1s / length($mask) ];
 }
 
-=head2 score_parts()
+=head2 score_parts
 
-  $score_parts = $p->score_parts();
+  $score_parts = $p->score_parts;
   $score_parts = $p->score_parts( $open_separator, $close_separator );
   $score_parts = $p->score_parts( $open_separator, $close_separator, $line_terminator );
 
