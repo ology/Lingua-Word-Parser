@@ -1,6 +1,8 @@
 Revision history for Lingua-Word-Parser
 
 {{$NEXT}}
+    - Rename eg/synopis to eg/basic.
+    - Improve documentation.
 
 0.0805 2020-03-22
     - Clean up test file and add more cases.
