@@ -63,7 +63,7 @@ lines of the form:
 Please see the included F<eg/lexicon.dat> example file.
 
 A database lexicon must have records as above, but with the column
-names, B<affix> and B<definition>.  Please see the included
+names, B<id>, B<affix> and B<definition>.  Please see the included
 F<eg/word_part.sql> example file.
 
 =cut
