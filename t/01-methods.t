@@ -10,10 +10,10 @@ my $p = new_ok 'Lingua::Word::Parser';
 
 ok !$p->{lex}, 'no lex';
 
-$p = Lingua::Word::Parser->new(
+$p = new_ok 'Lingua::Word::Parser' => [
     file => 'eg/lexicon.dat',
     word => 'abioticaly',
-);
+];
 
 isa_ok $p->{lex}, 'HASH';
 ok keys %{ $p->{lex} }, 'lex';
