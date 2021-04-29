@@ -127,15 +127,18 @@ sub _init {
 sub _fetch_lex {
     my $self = shift;
 
+    my $i = 0;
+
     # Open the given file for reading...
     my $fh = IO::File->new;
     $fh->open( "< $self->{file}" ) or die "Can't read file: '$self->{file}'";
     for ( <$fh> ) {
+        $i++;
         # Split space-separated entries.
         chomp;
         my ($re, $defn) = split /\s+/, $_, 2;
         # Add the entry to the lexicon.
-        $self->{lex}{$re} = { defn => $defn, re => qr/$re/ };
+        $self->{lex}{$i} = { defn => $defn, re => qr/$re/ };
     }
     $fh->close;
 
@@ -150,14 +153,14 @@ sub _db_fetch {
     my $dbh = DBI->connect( $dsn, $self->{dbuser}, $self->{dbpass}, { RaiseError => 1, AutoCommit => 1 } )
       or die "Unable to connect to $self->{dbname}: $DBI::errstr\n";
 
-    my $sql = 'SELECT affix, definition FROM fragment';
+    my $sql = 'SELECT id, affix, definition FROM fragment';
 
     my $sth = $dbh->prepare($sql);
     $sth->execute or die "Unable to execute '$sql': $DBI::errstr\n";
 
     while( my @row = $sth->fetchrow_array ) {
-        my $part = $row[0];
-        $self->{lex}{$part} = { re => qr/$part/, defn => $row[1] };
+        my ($id, $part, $defn) = @row;
+        $self->{lex}{$id} = { re => qr/$part/, defn => $defn };
     }
     die "Fetch terminated early: $DBI::errstr\n" if $DBI::errstr;
 
