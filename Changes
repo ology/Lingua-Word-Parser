@@ -1,6 +1,8 @@
 Revision history for Lingua-Word-Parser
 
 {{$NEXT}}
+
+0.0807 2022-10-22
     - Avoid implicit imports.
 
 0.0806 2021-04-29
