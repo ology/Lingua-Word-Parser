@@ -1,6 +1,7 @@
 Revision history for Lingua-Word-Parser
 
 {{$NEXT}}
+    - Avoid implicit imports.
 
 0.0806 2021-04-29
     - Rename eg/synopis to eg/basic.

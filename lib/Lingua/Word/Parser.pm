@@ -5,14 +5,14 @@ package Lingua::Word::Parser;
 use strict;
 use warnings;
 
-our $VERSION = '0.0806';
+our $VERSION = '0.0807';
 
-use Bit::Vector;
-use DBI;
-use List::PowerSet qw( powerset_lazy );
-use IO::File;
+use Bit::Vector ();
+use DBI ();
+use List::PowerSet qw(powerset_lazy);
+use IO::File ();
 
-use Memoize;
+use Memoize qw(memoize);
 memoize('_does_not_overlap');
 memoize('power');
 memoize('_reconstruct');
