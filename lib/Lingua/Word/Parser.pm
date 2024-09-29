@@ -148,7 +148,13 @@ sub _fetch_lex {
 sub _db_fetch {
     my $self = shift;
 
-    my $dsn = "DBI:$self->{dbtype}:$self->{dbname};$self->{dbhost}";
+    my $dsn;
+    if (lc($self->{dbtype}) eq 'sqlite') {
+      $dsn = "DBI:$self->{dbtype}:dbname=$self->{dbname};$self->{dbhost}";
+    }
+    else {
+      $dsn = "DBI:$self->{dbtype}:$self->{dbname};$self->{dbhost}";
+    }
 
     my $dbh = DBI->connect( $dsn, $self->{dbuser}, $self->{dbpass}, { RaiseError => 1, AutoCommit => 1 } )
       or die "Unable to connect to $self->{dbname}: $DBI::errstr\n";
