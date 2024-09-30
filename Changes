@@ -1,6 +1,7 @@
 Revision history for Lingua-Word-Parser
 
 {{$NEXT}}
+    - Metacpan barfed. Maybe this time it will work?
 
 0.0808 2024-09-29 10:16:04
     - Special case the DSN for SQLite.
