@@ -1,6 +1,7 @@
 Revision history for Lingua-Word-Parser
 
 {{$NEXT}}
+    - Fix things!
 
 0.0809 2024-09-30 07:59:02
     - Metacpan barfed. Maybe this time it will work?

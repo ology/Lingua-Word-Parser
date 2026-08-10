@@ -13,14 +13,8 @@ use List::PowerSet qw(powerset_lazy);
 use IO::File ();
 
 use Memoize qw(memoize);
-memoize('_does_not_overlap');
-memoize('power');
-memoize('_reconstruct');
 memoize('_grouping');
-memoize('score');
-memoize('score_parts');
 memoize('_rle');
-memoize('_or_together');
 
 =head1 SYNOPSIS
 
@@ -131,7 +125,7 @@ sub _fetch_lex {
 
     # Open the given file for reading...
     my $fh = IO::File->new;
-    $fh->open( "< $self->{file}" ) or die "Can't read file: '$self->{file}'";
+    $fh->open($self->{file}, '<') or die "Can't read file: '$self->{file}'";
     for ( <$fh> ) {
         $i++;
         # Split space-separated entries.
@@ -196,9 +190,11 @@ sub knowns {
             # Get matched word-part.
             my $part = substr $self->{word}, $m, $n - $m;
 
+            next if $n == $m;   # skip zero-width matches instead of padding the mask
+
             # Create the part-of-word bitmask.
             my $mask = 0 x $m;                      # Before known
-            $mask   .= 1 x (($n - $m) || 1);        # Known part
+            $mask   .= 1 x ($n - $m);               # Known part
             $mask   .= 0 x ($self->{wlen} - $n);    # After known
 
             # Output our progress.
