@@ -399,11 +399,11 @@ sub score_parts {
         my ( $s, $m ) = _reconstruct( $self->{word}, $c, $open_separator, $close_separator );
 
         my $defn = [];
-        for my $i ( @$m )
+        for my $k ( @$m )
         {
             for my $j ( keys %{ $self->{known} } )
             {
-                push @$defn, $self->{known}{$j}{defn} if $self->{known}{$j}{mask} eq $i;
+                push @$defn, $self->{known}{$j}{defn} if $self->{known}{$j}{mask} eq $k;
             }
         }
 
