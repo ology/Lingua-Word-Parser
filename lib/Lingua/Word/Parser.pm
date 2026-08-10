@@ -9,7 +9,6 @@ our $VERSION = '0.0809';
 
 use Bit::Vector ();
 use DBI ();
-use List::PowerSet qw(powerset_lazy);
 use IO::File ();
 
 use Memoize qw(memoize);
@@ -236,46 +235,29 @@ all masks.
 sub power {
     my $self = shift;
 
-    # Get a new powerset generator.
-    my $power = powerset_lazy(sort keys %{ $self->{masks} });
-
-    # Consider each member of the powerset.. to save or skip?
-    while (my $collection = $power->()) {
-#        warn "C: @$collection\n";
-
-        # Save this collection if it has only one item.
-        if (1 == @$collection) {
-#            warn "\t\tE: only 1 mask\n";
-            push @{ $self->{combos} }, $collection;
-            next;
-        }
-
-        # Compare each mask against the others.
-        LOOP: for my $i (0 .. @$collection - 1) {
-
-            # Set the comparison mask.
-            my $compare = $collection->[$i];
-
-            for my $j ($i + 1 .. @$collection - 1) {
-
-                # Set the current mask.
-                my $mask = $collection->[$j];
-#                warn "\tP:$compare v $mask\n";
-
-                # Skip this collection if an overlap is found.
-                if (not $self->_does_not_overlap($compare, $mask)) {
-#                    warn "\t\tO:$compare v $mask\n";
-                    last LOOP;
-                }
-
-                # Save this collection if we made it to the last pair.
-                if ($i == @$collection - 2 && $j == @$collection - 1) {
-#                    warn "\t\tE:$compare v $mask\n";
-                    push @{ $self->{combos} }, $collection;
-                }
-            }
-        }
+    # Precompute each mask's [start, end) span once
+    my @spans;
+    for my $mask (keys %{ $self->{masks} }) {
+        $mask =~ /^(0*)(1+)/;
+        push @spans, { start => length($1), end => length($1) + length($2), mask => $mask };
     }
+    @spans = sort { $a->{start} <=> $b->{start} } @spans;
+
+    # Recursively extend only with spans that don't overlap what's already chosen
+    my @combos;
+    my $extend;
+    $extend = sub {
+        my ($from_idx, $chosen) = @_;
+        push @combos, [ map { $_->{mask} } @$chosen ] if @$chosen;
+        for my $idx ($from_idx .. $#spans) {
+            my $span = $spans[$idx];
+            next if @$chosen && $span->{start} < $chosen->[-1]{end};
+            $extend->($idx + 1, [ @$chosen, $span ]);
+        }
+    };
+    $extend->(0, []);
+
+    $self->{combos} = \@combos;
 
     # Hand back the "non-overlapping powerset."
     return $self->{combos};
