@@ -5,7 +5,7 @@ package Lingua::Word::Parser;
 use strict;
 use warnings;
 
-our $VERSION = '0.0900';
+our $VERSION = '0.0901';
 
 use Bit::Vector ();
 use DBI ();
@@ -257,9 +257,31 @@ sub power {
     };
     $extend->(0, []);
 
-    $self->{combos} = \@combos;
+    # Drop non-maximal combos: if some known span could still be added to a
+    # combo without overlapping anything already in it, that combo is a
+    # strictly weaker duplicate and shouldn't be scored on its own.
+    my @maximal;
+    COMBO: for my $combo (@combos) {
+        my %chosen = map { $_ => 1 } @$combo;
+        my @chosen_spans = sort { $a->{start} <=> $b->{start} }
+                            grep { $chosen{ $_->{mask} } } @spans;
 
-    # Hand back the "non-overlapping powerset."
+        for my $span (@spans) {
+            next if $chosen{ $span->{mask} };
+            my $overlaps = 0;
+            for my $cs (@chosen_spans) {
+                if ( $span->{start} < $cs->{end} && $cs->{start} < $span->{end} ) {
+                    $overlaps = 1;
+                    last;
+                }
+            }
+            next COMBO unless $overlaps;    # an addable span exists -- not maximal
+        }
+        push @maximal, $combo;
+    }
+
+    $self->{combos} = \@maximal;
+
     return $self->{combos};
 }
 

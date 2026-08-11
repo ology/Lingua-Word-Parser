@@ -1,6 +1,7 @@
 Revision history for Lingua-Word-Parser
 
 {{$NEXT}}
+    - Drop non-maximal combos.
 
 0.0900 2026-08-09 23:40:13
     - Fix / optimize many things!
